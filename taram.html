@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>taram package &mdash; taram 0.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="taram.testing package" href="taram.testing.html" />
+    <link rel="prev" title="taram" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            taram
+          </a>
+              <div class="version">
+                0.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networking.html">Networking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="github.html">GitHub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services.html">Services</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">taram</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">taram package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="taram.testing.html">taram.testing package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-taram.dockerapi">taram.dockerapi module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#taram.dockerapi.Dockerapi"><code class="docutils literal notranslate"><span class="pre">Dockerapi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.dockerapi.DockerapiService"><code class="docutils literal notranslate"><span class="pre">DockerapiService</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.dockerapi.get_service"><code class="docutils literal notranslate"><span class="pre">get_service()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.dockerapi.get_services"><code class="docutils literal notranslate"><span class="pre">get_services()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.dockerapi.lifespan"><code class="docutils literal notranslate"><span class="pre">lifespan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.dockerapi.post_service_action"><code class="docutils literal notranslate"><span class="pre">post_service_action()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.dockerapi.unicorn_exception_handler"><code class="docutils literal notranslate"><span class="pre">unicorn_exception_handler()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-taram.logger">taram.logger module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#taram.logger.JsonFormatter"><code class="docutils literal notranslate"><span class="pre">JsonFormatter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.logger.LoggerFormatter"><code class="docutils literal notranslate"><span class="pre">LoggerFormatter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.logger.LoggerHandlerAction"><code class="docutils literal notranslate"><span class="pre">LoggerHandlerAction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.logger.LoggerLevelAction"><code class="docutils literal notranslate"><span class="pre">LoggerLevelAction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.logger.logger_context"><code class="docutils literal notranslate"><span class="pre">logger_context()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.logger.remove_log_context"><code class="docutils literal notranslate"><span class="pre">remove_log_context()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.logger.set_log_context"><code class="docutils literal notranslate"><span class="pre">set_log_context()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.logger.setup_logger"><code class="docutils literal notranslate"><span class="pre">setup_logger()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-taram.netfilter">taram.netfilter module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#taram.netfilter.Netfilter"><code class="docutils literal notranslate"><span class="pre">Netfilter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.netfilter.NetfilterError"><code class="docutils literal notranslate"><span class="pre">NetfilterError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.netfilter.NetfilterService"><code class="docutils literal notranslate"><span class="pre">NetfilterService</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.netfilter.NetfilterTables"><code class="docutils literal notranslate"><span class="pre">NetfilterTables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.netfilter.get_ip"><code class="docutils literal notranslate"><span class="pre">get_ip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.netfilter.is_ip"><code class="docutils literal notranslate"><span class="pre">is_ip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.netfilter.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#taram.netfilter.resolve_addresses"><code class="docutils literal notranslate"><span class="pre">resolve_addresses()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-taram">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">How to contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="style_guide.html">Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changes.html">Changes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">taram</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">taram</a></li>
+      <li class="breadcrumb-item active">taram package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/taram.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="taram-package">
+<h1>taram package<a class="headerlink" href="#taram-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="taram.testing.html">taram.testing package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="taram.testing.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="taram.testing.html#module-taram.testing.compose">taram.testing.compose module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="taram.testing.html#taram.testing.compose.ComposeClient"><code class="docutils literal notranslate"><span class="pre">ComposeClient</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="taram.testing.html#taram.testing.compose.ComposeClient.container"><code class="docutils literal notranslate"><span class="pre">ComposeClient.container</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="taram.testing.html#taram.testing.compose.ComposeClient.container_id"><code class="docutils literal notranslate"><span class="pre">ComposeClient.container_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="taram.testing.html#taram.testing.compose.ComposeClient.ip"><code class="docutils literal notranslate"><span class="pre">ComposeClient.ip</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="taram.testing.html#taram.testing.compose.ComposeClient.name"><code class="docutils literal notranslate"><span class="pre">ComposeClient.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="taram.testing.html#taram.testing.compose.ComposeClient.started_at"><code class="docutils literal notranslate"><span class="pre">ComposeClient.started_at</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="taram.testing.html#taram.testing.compose.ComposeServer"><code class="docutils literal notranslate"><span class="pre">ComposeServer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="taram.testing.html#taram.testing.compose.ComposeServer.prepare_func"><code class="docutils literal notranslate"><span class="pre">ComposeServer.prepare_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="taram.testing.html#taram.testing.compose.ComposeServer.run"><code class="docutils literal notranslate"><span class="pre">ComposeServer.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="taram.testing.html#module-taram.testing.fixtures">taram.testing.fixtures module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="taram.testing.html#taram.testing.fixtures.clamd_client"><code class="docutils literal notranslate"><span class="pre">clamd_client()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="taram.testing.html#taram.testing.fixtures.dockerapi_app"><code class="docutils literal notranslate"><span class="pre">dockerapi_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="taram.testing.html#taram.testing.fixtures.dockerapi_client"><code class="docutils literal notranslate"><span class="pre">dockerapi_client()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="taram.testing.html#taram.testing.fixtures.logger_handler"><code class="docutils literal notranslate"><span class="pre">logger_handler()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="taram.testing.html#taram.testing.fixtures.project"><code class="docutils literal notranslate"><span class="pre">project()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="taram.testing.html#taram.testing.fixtures.redis_client"><code class="docutils literal notranslate"><span class="pre">redis_client()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="taram.testing.html#taram.testing.fixtures.unbound_client"><code class="docutils literal notranslate"><span class="pre">unbound_client()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="taram.testing.html#module-taram.testing.logger">taram.testing.logger module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="taram.testing.html#taram.testing.logger.LoggerHandler"><code class="docutils literal notranslate"><span class="pre">LoggerHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="taram.testing.html#taram.testing.logger.LoggerHandler.emit"><code class="docutils literal notranslate"><span class="pre">LoggerHandler.emit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="taram.testing.html#taram.testing.logger.logger_time"><code class="docutils literal notranslate"><span class="pre">logger_time()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="taram.testing.html#module-taram.testing">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-taram.dockerapi">
+<span id="taram-dockerapi-module"></span><h2>taram.dockerapi module<a class="headerlink" href="#module-taram.dockerapi" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="taram.dockerapi.Dockerapi">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.dockerapi.</span></span><span class="sig-name descname"><span class="pre">Dockerapi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">docker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.dockerapi.Dockerapi" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.dockerapi.Dockerapi.close">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#taram.dockerapi.Dockerapi.close" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.dockerapi.Dockerapi.docker">
+<span class="sig-name descname"><span class="pre">docker</span></span><a class="headerlink" href="#taram.dockerapi.Dockerapi.docker" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.dockerapi.Dockerapi.from_url">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#taram.dockerapi.Dockerapi" title="taram.dockerapi.Dockerapi"><span class="pre">Dockerapi</span></a></span></span><a class="headerlink" href="#taram.dockerapi.Dockerapi.from_url" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.dockerapi.Dockerapi.get_service">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.dockerapi.Dockerapi.get_service" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.dockerapi.Dockerapi.get_services">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_services</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.dockerapi.Dockerapi.get_services" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.dockerapi.Dockerapi.project">
+<span class="sig-name descname"><span class="pre">project</span></span><a class="headerlink" href="#taram.dockerapi.Dockerapi.project" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="taram.dockerapi.DockerapiService">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.dockerapi.</span></span><span class="sig-name descname"><span class="pre">DockerapiService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">containers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.dockerapi.DockerapiService" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.dockerapi.DockerapiService.call">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#taram.dockerapi.DockerapiService.call" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.dockerapi.DockerapiService.containers">
+<span class="sig-name descname"><span class="pre">containers</span></span><a class="headerlink" href="#taram.dockerapi.DockerapiService.containers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.dockerapi.DockerapiService.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#taram.dockerapi.DockerapiService.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.dockerapi.get_service">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.dockerapi.</span></span><span class="sig-name descname"><span class="pre">get_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.dockerapi.get_service" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.dockerapi.get_services">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.dockerapi.</span></span><span class="sig-name descname"><span class="pre">get_services</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.dockerapi.get_services" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.dockerapi.lifespan">
+<span class="sig-prename descclassname"><span class="pre">taram.dockerapi.</span></span><span class="sig-name descname"><span class="pre">lifespan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FastAPI</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.dockerapi.lifespan" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.dockerapi.post_service_action">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.dockerapi.</span></span><span class="sig-name descname"><span class="pre">post_service_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.dockerapi.post_service_action" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.dockerapi.unicorn_exception_handler">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.dockerapi.</span></span><span class="sig-name descname"><span class="pre">unicorn_exception_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.dockerapi.unicorn_exception_handler" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-taram.logger">
+<span id="taram-logger-module"></span><h2>taram.logger module<a class="headerlink" href="#module-taram.logger" title="Permalink to this heading"></a></h2>
+<p>Logger to setup logging for consistent messages.</p>
+<p>The root logger can be setup like this which typically happens in the main
+entrypoint or in the lambda handler:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">logger</span> <span class="o">=</span> <span class="n">setup_logger</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logger</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;root&#39;</span>
+</pre></div>
+</div>
+<p>The setup can also be parameterized with a custom log level or log handler:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">handler</span> <span class="o">=</span> <span class="n">LoggerHandlerAction</span><span class="o">.</span><span class="n">get_handler</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logger</span> <span class="o">=</span> <span class="n">setup_logger</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="n">handler</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The logger is typically instantiated with the name of the module at the top
+of source files:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, that logger is used inside functions and methods to log messages:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">taram.testing.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger_time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">logger_time</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;created </span><span class="si">%(user)s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">})</span>
+<span class="go">1970-01-01 00:00:00.000000 INFO    taram.logger created x</span>
+</pre></div>
+</div>
+<p>It is also possible to add structured context information to the messages:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">logger_context</span><span class="p">({</span><span class="s1">&#39;lambda&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">}),</span> <span class="n">logger_time</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">)</span>
+<span class="go">1970-01-01 00:00:00.000000 WARNING taram.logger [{&quot;lambda&quot;: &quot;x&quot;}] message</span>
+</pre></div>
+</div>
+<p>The LoggerLevelAction provides argument defaults for the log level:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">argparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgumentParser</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">action</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--log-level&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">LoggerLevelAction</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">([</span><span class="s1">&#39;--log-level&#39;</span><span class="p">,</span> <span class="s1">&#39;debug&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span><span class="o">.</span><span class="n">log_level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>The LoggerHandlerAction also provides argument defaults for the log handler:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">action</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--log-file&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">LoggerHandlerAction</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">([</span><span class="s1">&#39;--log-file&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">StreamHandler</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">log_file</span><span class="p">,</span> <span class="n">StreamHandler</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>The log level and log file can then be used to setup the root logger like this:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">logger</span> <span class="o">=</span> <span class="n">setup_logger</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">log_level</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">log_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="taram.logger.JsonFormatter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.logger.</span></span><span class="sig-name descname"><span class="pre">JsonFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.logger.JsonFormatter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#taram.logger.LoggerFormatter" title="taram.logger.LoggerFormatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoggerFormatter</span></code></a></p>
+<p>Logger formatter with sensible defaults.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.logger.JsonFormatter.formatMessage">
+<span class="sig-name descname"><span class="pre">formatMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.logger.JsonFormatter.formatMessage" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="taram.logger.LoggerFormatter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.logger.</span></span><span class="sig-name descname"><span class="pre">LoggerFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.logger.LoggerFormatter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Formatter</span></code></p>
+<p>Logger formatter with sensible defaults.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.logger.LoggerFormatter.converter">
+<span class="sig-name descname"><span class="pre">converter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.logger.LoggerFormatter.converter" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>localtime([seconds]) -&gt; (tm_year,tm_mon,tm_mday,tm_hour,tm_min,</dt><dd><p>tm_sec,tm_wday,tm_yday,tm_isdst)</p>
+</dd>
+</dl>
+<p>Convert seconds since the Epoch to a time tuple expressing local time.
+When ‘seconds’ is not passed in, convert the current time instead.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.logger.LoggerFormatter.formatTime">
+<span class="sig-name descname"><span class="pre">formatTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.logger.LoggerFormatter.formatTime" title="Permalink to this definition"></a></dt>
+<dd><p>Format time with support for microseconds.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="taram.logger.LoggerHandlerAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.logger.</span></span><span class="sig-name descname"><span class="pre">LoggerHandlerAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option_strings</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.logger.LoggerHandlerAction" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Action</span></code></p>
+<p>Argument action for a logger handler.</p>
+<p>Return a stream handler to stderr by default, a stream handler to
+stdout with ‘-’ or a file handler.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.logger.LoggerHandlerAction.get_handler">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.logger.LoggerHandlerAction.get_handler" title="Permalink to this definition"></a></dt>
+<dd><p>Get a logger handler by name with a formatter.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.logger.LoggerHandlerAction.metavar">
+<span class="sig-name descname"><span class="pre">metavar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'FILE'</span></em><a class="headerlink" href="#taram.logger.LoggerHandlerAction.metavar" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="taram.logger.LoggerLevelAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.logger.</span></span><span class="sig-name descname"><span class="pre">LoggerLevelAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option_strings</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.logger.LoggerLevelAction" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Action</span></code></p>
+<p>Argument action for a logger level.</p>
+<p>Return a numeric value for the log level.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.logger.LoggerLevelAction.choices">
+<span class="sig-name descname"><span class="pre">choices</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['debug',</span> <span class="pre">'info',</span> <span class="pre">'warning',</span> <span class="pre">'error',</span> <span class="pre">'critical']</span></em><a class="headerlink" href="#taram.logger.LoggerLevelAction.choices" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.logger.LoggerLevelAction.default">
+<span class="sig-name descname"><span class="pre">default</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#taram.logger.LoggerLevelAction.default" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.logger.LoggerLevelAction.metavar">
+<span class="sig-name descname"><span class="pre">metavar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'LEVEL'</span></em><a class="headerlink" href="#taram.logger.LoggerLevelAction.metavar" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.logger.logger_context">
+<span class="sig-prename descclassname"><span class="pre">taram.logger.</span></span><span class="sig-name descname"><span class="pre">logger_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.logger.logger_context" title="Permalink to this definition"></a></dt>
+<dd><p>Context managed function to add log message context.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.logger.remove_log_context">
+<span class="sig-prename descclassname"><span class="pre">taram.logger.</span></span><span class="sig-name descname"><span class="pre">remove_log_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.logger.remove_log_context" title="Permalink to this definition"></a></dt>
+<dd><p>Remove a log context from all log records.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.logger.set_log_context">
+<span class="sig-prename descclassname"><span class="pre">taram.logger.</span></span><span class="sig-name descname"><span class="pre">set_log_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.logger.set_log_context" title="Permalink to this definition"></a></dt>
+<dd><p>Set context to all log records.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.logger.setup_logger">
+<span class="sig-prename descclassname"><span class="pre">taram.logger.</span></span><span class="sig-name descname"><span class="pre">setup_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.logger.setup_logger" title="Permalink to this definition"></a></dt>
+<dd><p>Set a Logger instance with a handler.</p>
+</dd></dl>
+
+</section>
+<section id="module-taram.netfilter">
+<span id="taram-netfilter-module"></span><h2>taram.netfilter module<a class="headerlink" href="#module-taram.netfilter" title="Permalink to this heading"></a></h2>
+<p>Network filtering.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.netfilter.</span></span><span class="sig-name descname"><span class="pre">Netfilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">redis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ipv4_tables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ipv6_tables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bans</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blacklist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whitelist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.Netfilter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.autopurge">
+<span class="sig-name descname"><span class="pre">autopurge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.Netfilter.autopurge" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.ban">
+<span class="sig-name descname"><span class="pre">ban</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.Netfilter.ban" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.bans">
+<span class="sig-name descname"><span class="pre">bans</span></span><a class="headerlink" href="#taram.netfilter.Netfilter.bans" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.blacklist">
+<span class="sig-name descname"><span class="pre">blacklist</span></span><a class="headerlink" href="#taram.netfilter.Netfilter.blacklist" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.calc_net_ban_time">
+<span class="sig-name descname"><span class="pre">calc_net_ban_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ban_counter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.Netfilter.calc_net_ban_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.chain_order">
+<span class="sig-name descname"><span class="pre">chain_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.Netfilter.chain_order" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.Netfilter.clear" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.f2boptions">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">f2boptions</span></span><a class="headerlink" href="#taram.netfilter.Netfilter.f2boptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.from_env">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.Netfilter.from_env" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.ipv4_tables">
+<span class="sig-name descname"><span class="pre">ipv4_tables</span></span><a class="headerlink" href="#taram.netfilter.Netfilter.ipv4_tables" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.ipv6_tables">
+<span class="sig-name descname"><span class="pre">ipv6_tables</span></span><a class="headerlink" href="#taram.netfilter.Netfilter.ipv6_tables" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.lock">
+<span class="sig-name descname"><span class="pre">lock</span></span><a class="headerlink" href="#taram.netfilter.Netfilter.lock" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.perm_ban">
+<span class="sig-name descname"><span class="pre">perm_ban</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unban</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.Netfilter.perm_ban" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.redis">
+<span class="sig-name descname"><span class="pre">redis</span></span><a class="headerlink" href="#taram.netfilter.Netfilter.redis" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.unban">
+<span class="sig-name descname"><span class="pre">unban</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.Netfilter.unban" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.update_blacklist">
+<span class="sig-name descname"><span class="pre">update_blacklist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.Netfilter.update_blacklist" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.update_whitelist">
+<span class="sig-name descname"><span class="pre">update_whitelist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.Netfilter.update_whitelist" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.Netfilter.whitelist">
+<span class="sig-name descname"><span class="pre">whitelist</span></span><a class="headerlink" href="#taram.netfilter.Netfilter.whitelist" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.netfilter.</span></span><span class="sig-name descname"><span class="pre">NetfilterError</span></span><a class="headerlink" href="#taram.netfilter.NetfilterError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Raised when an unexpected error happens.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.netfilter.</span></span><span class="sig-name descname"><span class="pre">NetfilterService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">netfilter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pubsub</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exit_now</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exit_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_before_exit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterService" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.autopurge">
+<span class="sig-name descname"><span class="pre">autopurge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterService.autopurge" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.before_exit">
+<span class="sig-name descname"><span class="pre">before_exit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterService.before_exit" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.blacklist">
+<span class="sig-name descname"><span class="pre">blacklist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterService.blacklist" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.chain_order">
+<span class="sig-name descname"><span class="pre">chain_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterService.chain_order" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.clear_before_exit">
+<span class="sig-name descname"><span class="pre">clear_before_exit</span></span><a class="headerlink" href="#taram.netfilter.NetfilterService.clear_before_exit" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.exit_code">
+<span class="sig-name descname"><span class="pre">exit_code</span></span><a class="headerlink" href="#taram.netfilter.NetfilterService.exit_code" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.exit_now">
+<span class="sig-name descname"><span class="pre">exit_now</span></span><a class="headerlink" href="#taram.netfilter.NetfilterService.exit_now" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.f2bregex">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">f2bregex</span></span><a class="headerlink" href="#taram.netfilter.NetfilterService.f2bregex" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.from_netfilter">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_netfilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">netfilter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterService.from_netfilter" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.netfilter">
+<span class="sig-name descname"><span class="pre">netfilter</span></span><a class="headerlink" href="#taram.netfilter.NetfilterService.netfilter" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.pubsub">
+<span class="sig-name descname"><span class="pre">pubsub</span></span><a class="headerlink" href="#taram.netfilter.NetfilterService.pubsub" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.sigterm_exit">
+<span class="sig-name descname"><span class="pre">sigterm_exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterService.sigterm_exit" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.snat4">
+<span class="sig-name descname"><span class="pre">snat4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snat_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterService.snat4" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.snat6">
+<span class="sig-name descname"><span class="pre">snat6</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snat_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterService.snat6" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.watch">
+<span class="sig-name descname"><span class="pre">watch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterService.watch" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterService.whitelist">
+<span class="sig-name descname"><span class="pre">whitelist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterService.whitelist" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.netfilter.</span></span><span class="sig-name descname"><span class="pre">NetfilterTables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.add_chain">
+<span class="sig-name descname"><span class="pre">add_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.add_chain" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.ban">
+<span class="sig-name descname"><span class="pre">ban</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ipaddr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.ban" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.chains">
+<span class="sig-name descname"><span class="pre">chains</span></span><a class="headerlink" href="#taram.netfilter.NetfilterTables.chains" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.check">
+<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.check" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.check_chain_order">
+<span class="sig-name descname"><span class="pre">check_chain_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.check_chain_order" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.clear" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.comment">
+<span class="sig-name descname"><span class="pre">comment</span></span><a class="headerlink" href="#taram.netfilter.NetfilterTables.comment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.create_isolation_rule">
+<span class="sig-name descname"><span class="pre">create_isolation_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dports</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.create_isolation_rule" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.delete_chain">
+<span class="sig-name descname"><span class="pre">delete_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.delete_chain" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.delete_rule">
+<span class="sig-name descname"><span class="pre">delete_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.delete_rule" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.family">
+<span class="sig-name descname"><span class="pre">family</span></span><a class="headerlink" href="#taram.netfilter.NetfilterTables.family" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.flush_chain">
+<span class="sig-name descname"><span class="pre">flush_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.flush_chain" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.from_current_chains">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_current_chains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.from_current_chains" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.get_chain_handle">
+<span class="sig-name descname"><span class="pre">get_chain_handle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.get_chain_handle" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.get_rule_handles">
+<span class="sig-name descname"><span class="pre">get_rule_handles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.get_rule_handles" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.init_chains">
+<span class="sig-name descname"><span class="pre">init_chains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.init_chains" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.insert_mail_chains">
+<span class="sig-name descname"><span class="pre">insert_mail_chains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.insert_mail_chains" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.insert_mail_rule">
+<span class="sig-name descname"><span class="pre">insert_mail_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.insert_mail_rule" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.insert_rule">
+<span class="sig-name descname"><span class="pre">insert_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.insert_rule" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.list_chain">
+<span class="sig-name descname"><span class="pre">list_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.list_chain" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.list_chains">
+<span class="sig-name descname"><span class="pre">list_chains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.list_chains" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.list_table">
+<span class="sig-name descname"><span class="pre">list_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.list_table" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#taram.netfilter.NetfilterTables.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.nft">
+<span class="sig-name descname"><span class="pre">nft</span></span><a class="headerlink" href="#taram.netfilter.NetfilterTables.nft" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.run_cmd">
+<span class="sig-name descname"><span class="pre">run_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.run_cmd" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.snat">
+<span class="sig-name descname"><span class="pre">snat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snat_target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.snat" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.netfilter.NetfilterTables.unban">
+<span class="sig-name descname"><span class="pre">unban</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ipaddr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.NetfilterTables.unban" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.netfilter.get_ip">
+<span class="sig-prename descclassname"><span class="pre">taram.netfilter.</span></span><span class="sig-name descname"><span class="pre">get_ip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.get_ip" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.netfilter.is_ip">
+<span class="sig-prename descclassname"><span class="pre">taram.netfilter.</span></span><span class="sig-name descname"><span class="pre">is_ip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.is_ip" title="Permalink to this definition"></a></dt>
+<dd><p>Return whether the given address is an IP.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.netfilter.main">
+<span class="sig-prename descclassname"><span class="pre">taram.netfilter.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.main" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.netfilter.resolve_addresses">
+<span class="sig-prename descclassname"><span class="pre">taram.netfilter.</span></span><span class="sig-name descname"><span class="pre">resolve_addresses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addresses</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.netfilter.resolve_addresses" title="Permalink to this definition"></a></dt>
+<dd><p>Return IPs from a list of addresses that might be host names.</p>
+</dd></dl>
+
+</section>
+<section id="module-taram">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-taram" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="taram" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="taram.testing.html" class="btn btn-neutral float-right" title="taram.testing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Marc Tardif.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
