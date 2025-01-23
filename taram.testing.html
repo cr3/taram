@@ -148,8 +148,13 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="taram.testing.compose.ComposeServer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.testing.compose.</span></span><span class="sig-name descname"><span class="pre">ComposeServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.compose.ComposeServer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.testing.compose.</span></span><span class="sig-name descname"><span class="pre">ComposeServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/dev/null'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.compose.ComposeServer" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessServer</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="taram.testing.compose.ComposeServer.full_name">
+<span class="sig-name descname"><span class="pre">full_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.compose.ComposeServer.full_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="taram.testing.compose.ComposeServer.prepare_func">
 <span class="sig-name descname"><span class="pre">prepare_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controldir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.compose.ComposeServer.prepare_func" title="Permalink to this definition"></a></dt>
@@ -192,6 +197,12 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="taram.testing.fixtures.mysql_client">
+<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">mysql_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.mysql_client" title="Permalink to this definition"></a></dt>
+<dd><p>MySQL client fixture.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="taram.testing.fixtures.project">
 <span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">project</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.project" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -204,8 +215,14 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="taram.testing.fixtures.rspamd_client">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">rspamd_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.rspamd_client" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">rspamd_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">redis_client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.rspamd_client" title="Permalink to this definition"></a></dt>
 <dd><p>Clamd client fixture.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taram.testing.fixtures.temp_env_file">
+<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">temp_env_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.temp_env_file" title="Permalink to this definition"></a></dt>
+<dd><p>Yield a temporary env file that can be passed to docker compose.</p>
 </dd></dl>
 
 <dl class="py function">
