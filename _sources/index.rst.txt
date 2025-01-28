@@ -16,9 +16,9 @@ Configuration
 .. toctree::
    :maxdepth: 5
 
-   hardware
    networking
    github
+   system
    services
 
 API Reference
