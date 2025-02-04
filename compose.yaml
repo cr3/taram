@@ -13,6 +13,17 @@ services:
       mail-network:
         ipv4_address: ${IPV4_NETWORK:-172.22.1}.254
 
+  memcached:
+    image: memcached:alpine
+    command:
+      - memcached
+      - "-vv"
+    restart: always
+    networks:
+      mail-network:
+        aliases:
+          - memcached
+
   mysql:
     image: mariadb:10.5
     depends_on:
@@ -214,6 +225,7 @@ services:
     depends_on:
       - clamd
       - dockerapi
+      - memcached
       - monit
       - mysql
       - rspamd

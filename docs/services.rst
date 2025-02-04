@@ -93,6 +93,27 @@ manage Docker services programmatically. It serves several purposes:
 DockerAPI acts as the central mechanism for automating and orchestrating
 container operations in a controlled, and secure manner.
 
+Memcached
+---------
+
+`Memcached`_ is used as a caching layer to improve performance and reduce
+database load. Here’s why it’s included:
+
+* **Reduced Database Load**
+
+  Frequently accessed data, such as authentication tokens and user session
+  details, are cached in Memcached instead of repeatedly querying MySQL.
+
+* **Postfix & Dovecot Integration**
+
+  Some email-related operations, like authentication caching, benefit
+  from Memcached, improving email processing efficiency.
+
+Overall, Memcached helps optimize performance by reducing the need for
+repeated database queries and speeding up email operations.
+
+.. _Memcached: https://memcached.org/
+
 Monit
 -----
 

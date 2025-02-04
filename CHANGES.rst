@@ -1,12 +1,13 @@
 Version 0.2.0
 -------------
 
-Released 2025-01-27
+Released 2025-02-04
 
 -   Add backend service.
 -   Add clamd service.
 -   Add dockerapi service.
 -   Add dyndns service.
+-   Add memcached service.
 -   Add monit service.
 -   Add mysql service.
 -   Add netfilter service.

@@ -115,6 +115,19 @@ def dockerapi_client(env_file, project, process):
 
 
 @pytest.fixture(scope="session")
+def memcached_client(env_file, project, process):
+    """Memcached client fixture."""
+    server = ComposeServer(
+        "server listening",
+        env_file=env_file,
+        project=project,
+        process=process,
+    )
+    with server.run("memcached") as client:
+        yield client
+
+
+@pytest.fixture(scope="session")
 def mysql_client(env_file, project, process):
     """MySQL client fixture."""
     server = ComposeServer(
