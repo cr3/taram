@@ -6,6 +6,7 @@ Released 2025-02-04
 -   Add backend service.
 -   Add clamd service.
 -   Add dockerapi service.
+-   Add dovecot service.
 -   Add dyndns service.
 -   Add memcached service.
 -   Add monit service.

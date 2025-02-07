@@ -3,6 +3,20 @@
 echo ${IPV4_NETWORK}.0/24 > /etc/rspamd/custom/mail_networks.map
 echo ${IPV6_NETWORK} >> /etc/rspamd/custom/mail_networks.map
 
+DOVECOT_V4=
+DOVECOT_V6=
+until [[ ! -z ${DOVECOT_V4} ]]; do
+  DOVECOT_V4=$(dig a dovecot +short)
+  DOVECOT_V6=$(dig aaaa dovecot +short)
+  [[ ! -z ${DOVECOT_V4} ]] && break;
+  echo "Waiting for Dovecot..."
+  sleep 3
+done
+echo ${DOVECOT_V4}/32 > /etc/rspamd/custom/dovecot_trusted.map
+if [[ ! -z ${DOVECOT_V6} ]]; then
+  echo ${DOVECOT_V6}/128 >> /etc/rspamd/custom/dovecot_trusted.map
+fi
+
 RSPAMD_V4=
 RSPAMD_V6=
 until [[ ! -z ${RSPAMD_V4} ]]; do

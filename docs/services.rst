@@ -93,6 +93,44 @@ manage Docker services programmatically. It serves several purposes:
 DockerAPI acts as the central mechanism for automating and orchestrating
 container operations in a controlled, and secure manner.
 
+Dovecot
+-------
+
+`Dovecot`_ is an IMAP and POP3 server which is responsible for handling
+email retrieval by clients. Here’s why Dovecot is used:
+
+* **Secure Email Access**
+
+  Allows users to access their mailboxes securely via IMAP, IMAPS, POP3, and POP3S.
+
+* **High Performance**
+
+  Optimized for speed and efficiency, making it ideal for handling large
+  volumes of email.
+
+* **Authentication Management**
+
+  Integrates with other authentication system, ensuring secure login
+  with various mechanisms (e.g., SQL, LDAP, OAuth2).
+
+* **Mailbox Storage**
+
+  Manages and indexes Maildir storage, allowing for fast email retrieval.
+
+* **Sieve Filtering**
+
+  Supports Sieve for server-side email filtering, allowing users to set
+  up auto-responses, sorting rules, and spam handling.
+
+* **Integration with Other Services**
+
+  Works closely with Postfix (SMTP server) and Rspamd (spam filtering)
+  to provide a full-featured mail system.
+
+Overall, Dovecot ensures a smooth and secure email retrieval experience.
+
+.. _Dovecot: https://www.dovecot.org/
+
 Memcached
 ---------
 

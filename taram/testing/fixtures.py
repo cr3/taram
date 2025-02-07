@@ -115,6 +115,19 @@ def dockerapi_client(env_file, project, process):
 
 
 @pytest.fixture(scope="session")
+def dovecot_client(env_file, project, process):
+    """Dovecot client fixture."""
+    server = ComposeServer(
+        "dovecot entered RUNNING state",
+        env_file=env_file,
+        project=project,
+        process=process,
+    )
+    with server.run("dovecot") as client:
+        yield client
+
+
+@pytest.fixture(scope="session")
 def memcached_client(env_file, project, process):
     """Memcached client fixture."""
     server = ComposeServer(

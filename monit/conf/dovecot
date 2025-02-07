@@ -1,0 +1,3 @@
+check program dovecot with path "/opt/monit/scripts/monit-dovecot"
+  restart program = "/usr/bin/curl --silent -X POST http://dockerapi/services/dovecot/restart"
+  if status != 0 for 12 cycles then restart

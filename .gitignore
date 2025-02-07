@@ -1,3 +1,17 @@
+# Dovecot
+dovecot/conf/acl_anyone
+dovecot/conf/conf.d
+dovecot/conf/dovecot-master.passwd
+dovecot/conf/dovecot-master.userdb
+dovecot/conf/extra.conf
+dovecot/conf/lua
+dovecot/conf/mail_plugins
+dovecot/conf/shared_namespace.conf
+dovecot/conf/sni.conf
+dovecot/conf/sogo-sso.conf
+dovecot/conf/sogo_trusted_ip.conf
+dovecot/conf/sql
+
 # Dyndns
 dyndns/settings.txt
 
@@ -12,8 +26,10 @@ postfix/conf/dns_blocklists.cf
 postfix/conf/dnsbl_reply.map
 
 # Rspamd
+rspamd/custom/dovecot_trusted.map
 rspamd/custom/mail_networks.map
 rspamd/custom/rspamd_trusted.map
+rspamd/custom/sa-rules
 
 # SSL
 ssl-example/

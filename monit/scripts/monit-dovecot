@@ -1,0 +1,20 @@
+#!/usr/bin/bash
+
+err_count=0
+
+/usr/lib/nagios/plugins/check_smtp -4 -H dovecot -p 24 -f "monit@invalid" -C "RCPT TO:<monit@invalid>" -L -R "User doesn't exist"
+err_count=$(( ${err_count} + $? ))
+
+/usr/lib/nagios/plugins/check_imap -4 -H dovecot -p 993 -S -e "OK "
+err_count=$(( ${err_count} + $? ))
+
+/usr/lib/nagios/plugins/check_imap -4 -H dovecot -p 143 -e "OK "
+err_count=$(( ${err_count} + $? ))
+
+/usr/lib/nagios/plugins/check_tcp -4 -H dovecot -p 10001 -e "VERSION"
+err_count=$(( ${err_count} + $? ))
+
+/usr/lib/nagios/plugins/check_tcp -4 -H dovecot -p 4190 -e "Dovecot ready"
+err_count=$(( ${err_count} + $? ))
+
+exit $err_count

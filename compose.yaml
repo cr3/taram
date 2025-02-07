@@ -107,6 +107,7 @@ services:
     stop_grace_period: 30s
     depends_on:
       - clamd
+      - dovecot
       - redis
     environment:
       - IPV4_NETWORK=${IPV4_NETWORK:-172.22.1}
@@ -158,6 +159,86 @@ services:
     networks:
       mail-network:
         ipv4_address: ${IPV4_NETWORK:-172.22.1}.253
+
+  dovecot:
+    build: dovecot
+    depends_on:
+      - mysql
+      - netfilter
+      - redis
+    dns:
+      - ${IPV4_NETWORK:-172.22.1}.254
+    cap_add:
+      - NET_BIND_SERVICE
+    volumes:
+      - ./dovecot/conf:/etc/dovecot:z
+      - ./dovecot/templates:/templates:z
+      - ./ssl:/etc/ssl/mail/:ro,z
+      - vmail-vol-1:/var/vmail
+      - vmail-index-vol-1:/var/vmail_index
+      - crypt-vol-1:/mail_crypt/
+      - ./rspamd/custom/:/etc/rspamd/custom:z
+      - rspamd-vol-1:/var/lib/rspamd
+      - mysql-socket-vol-1:/var/run/mysqld/
+    environment:
+      - DOVECOT_MASTER_USER=${DOVECOT_MASTER_USER:-}
+      - DOVECOT_MASTER_PASS=${DOVECOT_MASTER_PASS:-}
+      - MAIL_REPLICA_IP=${MAIL_REPLICA_IP:-}
+      - DOVEADM_REPLICA_PORT=${DOVEADM_REPLICA_PORT:-}
+      - LOG_LINES=${LOG_LINES:-9999}
+      - DBNAME=${DBNAME}
+      - DBUSER=${DBUSER}
+      - DBPASS=${DBPASS}
+      - MAIL_HOSTNAME=${MAIL_HOSTNAME}
+      - MAIL_PASS_SCHEME=${MAIL_PASS_SCHEME:-BLF-CRYPT}
+      - IPV4_NETWORK=${IPV4_NETWORK:-172.22.1}
+      - ALLOW_ADMIN_EMAIL_LOGIN=${ALLOW_ADMIN_EMAIL_LOGIN:-n}
+      - MAILDIR_GC_TIME=${MAILDIR_GC_TIME:-7200}
+      - ACL_ANYONE=${ACL_ANYONE:-disallow}
+      - SKIP_SOLR=${SKIP_SOLR:-y}
+      - MAILDIR_SUB=${MAILDIR_SUB:-}
+      - MASTER=${MASTER:-y}
+      - REDIS_SLAVEOF_IP=${REDIS_SLAVEOF_IP:-}
+      - REDIS_SLAVEOF_PORT=${REDIS_SLAVEOF_PORT:-}
+      - REDISPASS=${REDISPASS}
+      - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-taram}
+      - FLATCURVE_EXPERIMENTAL=${FLATCURVE_EXPERIMENTAL:-n}
+    ports:
+      - "${DOVEADM_PORT:-127.0.0.1:19991}:12345"
+      - "${IMAP_PORT:-143}:143"
+      - "${IMAPS_PORT:-993}:993"
+      - "${POP_PORT:-110}:110"
+      - "${POPS_PORT:-995}:995"
+      - "${SIEVE_PORT:-4190}:4190"
+    restart: always
+    tty: true
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.dovecot_imapsync_runner.schedule: "@every 1m"
+      ofelia.job-exec.dovecot_imapsync_runner.no-overlap: "true"
+      ofelia.job-exec.dovecot_imapsync_runner.command: "/bin/bash -c \"[[ $${MASTER} == y ]] && /usr/local/bin/gosu nobody /usr/local/bin/imapsync_runner.pl || exit 0\""
+      ofelia.job-exec.dovecot_trim_logs.schedule: "@every 1m"
+      ofelia.job-exec.dovecot_trim_logs.command: "/bin/bash -c \"[[ $${MASTER} == y ]] && /usr/local/bin/gosu vmail /usr/local/bin/trim_logs.sh || exit 0\""
+      ofelia.job-exec.dovecot_quarantine.schedule: "@every 20m"
+      ofelia.job-exec.dovecot_quarantine.command: "/bin/bash -c \"[[ $${MASTER} == y ]] && /usr/local/bin/gosu vmail /usr/local/bin/quarantine_notify.py || exit 0\""
+      ofelia.job-exec.dovecot_clean_q_aged.schedule: "@every 24h"
+      ofelia.job-exec.dovecot_clean_q_aged.command: "/bin/bash -c \"[[ $${MASTER} == y ]] && /usr/local/bin/gosu vmail /usr/local/bin/clean_q_aged.sh || exit 0\""
+      ofelia.job-exec.dovecot_maildir_gc.schedule: "@every 30m"
+      ofelia.job-exec.dovecot_maildir_gc.command: "/bin/bash -c \"source /source_env.sh ; /usr/local/bin/gosu vmail /usr/local/bin/maildir_gc.sh\""
+      ofelia.job-exec.dovecot_sarules.schedule: "@every 24h"
+      ofelia.job-exec.dovecot_sarules.command: "/bin/bash -c \"/usr/local/bin/sa-rules.sh\""
+      ofelia.job-exec.dovecot_fts.schedule: "@every 24h"
+      ofelia.job-exec.dovecot_fts.command: "/bin/bash -c \"/usr/local/bin/gosu vmail /usr/local/bin/optimize-fts.sh\""
+      ofelia.job-exec.dovecot_repl_health.schedule: "@every 5m"
+      ofelia.job-exec.dovecot_repl_health.command: "/bin/bash -c \"/usr/local/bin/gosu vmail /usr/local/bin/repl_health.sh\""
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    networks:
+      mail-network:
+        ipv4_address: ${IPV4_NETWORK:-172.22.1}.250
 
   netfilter:
     build:
@@ -224,10 +305,14 @@ services:
     image: robbertkl/ipv6nat
     depends_on:
       - clamd
+      - dovecot
       - dockerapi
       - memcached
       - monit
       - mysql
+      - netfilter
+      - postfix
+      - redis
       - rspamd
       - unbound
     security_opt:
@@ -259,3 +344,5 @@ volumes:
   postfix-vol-1:
   redis-vol-1:
   rspamd-vol-1:
+  vmail-vol-1:
+  vmail-index-vol-1:
