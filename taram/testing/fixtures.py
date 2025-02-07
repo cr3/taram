@@ -202,6 +202,19 @@ def rspamd_client(redis_client, env_file, project, process):
 
 
 @pytest.fixture(scope="session")
+def sogo_client(redis_client, env_file, project, process):
+    """SOGo client fixture."""
+    server = ComposeServer(
+        "notified the watchdog that we are ready",
+        env_file=env_file,
+        project=project,
+        process=process,
+    )
+    with server.run("sogo") as client:
+        yield client
+
+
+@pytest.fixture(scope="session")
 def unbound_client(project, process):
     """Unbound client fixture."""
     server = ComposeServer(

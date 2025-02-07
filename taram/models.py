@@ -216,6 +216,28 @@ class SenderAclModel(SQLModel):
     external: Mapped[bool] = mapped_column(server_default="0")
 
 
+class SogoStaticView(SQLModel):
+
+    __tablename__ = "_sogo_static_view"
+    __table_args__ = (Index("_sogo_static_view_domain_key", "domain"),)
+
+    c_uid: Mapped[int] = mapped_column(primary_key=True)
+    domain: Mapped[str] = mapped_column(String(255))
+    c_name: Mapped[str] = mapped_column(String(255))
+    c_password: Mapped[str] = mapped_column(String(255), server_default="")
+    c_cn: Mapped[Optional[str]] = mapped_column(String(255))
+    c_l: Mapped[Optional[str]] = mapped_column(String(255))
+    c_o: Mapped[Optional[str]] = mapped_column(String(255))
+    c_ou: Mapped[Optional[str]] = mapped_column(String(255))
+    c_telephonenumber: Mapped[Optional[str]] = mapped_column(String(255))
+    mail: Mapped[str] = mapped_column(String(255))
+    aliases: Mapped[str] = mapped_column(Text)
+    ad_aliases: Mapped[str] = mapped_column(String(6144), server_default="")
+    ext_acl: Mapped[str] = mapped_column(String(6144), server_default="")
+    kind: Mapped[str] = mapped_column(String(100), server_default="")
+    multiple_bookings: Mapped[int] = mapped_column(Integer, server_default="1")
+
+
 class SpamaliasModel(SQLModel):
 
     __tablename__ = "spamalias"

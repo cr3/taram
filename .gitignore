@@ -31,6 +31,12 @@ rspamd/custom/mail_networks.map
 rspamd/custom/rspamd_trusted.map
 rspamd/custom/sa-rules
 
+# SoGo
+sogo/conf/plist_ldap
+sogo/conf/sieve.creds
+sogo/conf/cron.creds
+sogo/conf/sogo-sso.pass
+
 # SSL
 ssl-example/
 ssl/

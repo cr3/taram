@@ -174,6 +174,7 @@ services:
       - ./dovecot/conf:/etc/dovecot:z
       - ./dovecot/templates:/templates:z
       - ./ssl:/etc/ssl/mail/:ro,z
+      - ./sogo/conf/:/etc/sogo/:z
       - vmail-vol-1:/var/vmail
       - vmail-index-vol-1:/var/vmail_index
       - crypt-vol-1:/mail_crypt/
@@ -239,6 +240,49 @@ services:
     networks:
       mail-network:
         ipv4_address: ${IPV4_NETWORK:-172.22.1}.250
+
+  sogo:
+    build: sogo
+    depends_on:
+      - backend
+      - redis
+    environment:
+      - DBNAME=${DBNAME}
+      - DBUSER=${DBUSER}
+      - DBPASS=${DBPASS}
+      - MAIL_HOSTNAME=${MAIL_HOSTNAME}
+#      - MAIL_PASS_SCHEME=${MAIL_PASS_SCHEME:-BLF-CRYPT}
+      - ACL_ANYONE=${ACL_ANYONE:-disallow}
+      - ALLOW_ADMIN_EMAIL_LOGIN=${ALLOW_ADMIN_EMAIL_LOGIN:-n}
+      - IPV4_NETWORK=${IPV4_NETWORK:-172.22.1}
+      - SOGO_EXPIRE_SESSION=${SOGO_EXPIRE_SESSION:-480}
+      - MASTER=${MASTER:-y}
+      - REDIS_SLAVEOF_IP=${REDIS_SLAVEOF_IP:-}
+      - REDIS_SLAVEOF_PORT=${REDIS_SLAVEOF_PORT:-}
+      - REDISPASS=${REDISPASS}
+    dns:
+      - ${IPV4_NETWORK:-172.22.1}.254
+    volumes:
+      - ./sogo/conf/:/etc/sogo/:z
+      - ./sogo/sogo.ico:/usr/lib/GNUstep/SOGo/WebServerResources/img/sogo.ico:z
+      - ./sogo/theme.js:/usr/lib/GNUstep/SOGo/WebServerResources/js/theme.js:z
+      - mysql-socket-vol-1:/var/run/mysqld/
+      - sogo-web-vol-1:/sogo_web
+      - sogo-userdata-backup-vol-1:/sogo_backup
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.sogo_sessions.schedule: "@every 1m"
+      ofelia.job-exec.sogo_sessions.command: "/bin/bash -c \"[[ $${MASTER} == y ]] && /usr/local/bin/gosu sogo /usr/sbin/sogo-tool -v expire-sessions $${SOGO_EXPIRE_SESSION} || exit 0\""
+      ofelia.job-exec.sogo_ealarms.schedule: "@every 1m"
+      ofelia.job-exec.sogo_ealarms.command: "/bin/bash -c \"[[ $${MASTER} == y ]] && /usr/local/bin/gosu sogo /usr/sbin/sogo-ealarms-notify -p /etc/sogo/cron.creds || exit 0\""
+      ofelia.job-exec.sogo_eautoreply.schedule: "@every 5m"
+      ofelia.job-exec.sogo_eautoreply.command: "/bin/bash -c \"[[ $${MASTER} == y ]] && /usr/local/bin/gosu sogo /usr/sbin/sogo-tool update-autoreply -p /etc/sogo/cron.creds || exit 0\""
+      ofelia.job-exec.sogo_backup.schedule: "@every 24h"
+      ofelia.job-exec.sogo_backup.command: "/bin/bash -c \"[[ $${MASTER} == y ]] && /usr/local/bin/gosu sogo /usr/sbin/sogo-tool backup /sogo_backup ALL || exit 0\""
+    restart: always
+    networks:
+      mail-network:
+        ipv4_address: ${IPV4_NETWORK:-172.22.1}.248
 
   netfilter:
     build:
@@ -314,6 +358,7 @@ services:
       - postfix
       - redis
       - rspamd
+      - sogo
       - unbound
     security_opt:
       - label=disable
@@ -344,5 +389,7 @@ volumes:
   postfix-vol-1:
   redis-vol-1:
   rspamd-vol-1:
+  sogo-web-vol-1:
+  sogo-userdata-backup-vol-1:
   vmail-vol-1:
   vmail-index-vol-1:

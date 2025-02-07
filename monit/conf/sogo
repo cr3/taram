@@ -1,0 +1,3 @@
+check program sogo with path "/opt/monit/scripts/monit-sogo"
+  restart program = "/usr/bin/curl --silent -X POST http://dockerapi/services/sogo/restart"
+  if status != 0 for 3 cycles then restart
