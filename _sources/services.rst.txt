@@ -93,6 +93,65 @@ manage Docker services programmatically. It serves several purposes:
 DockerAPI acts as the central mechanism for automating and orchestrating
 container operations in a controlled, and secure manner.
 
+Dovecot
+-------
+
+`Dovecot`_ is an IMAP and POP3 server which is responsible for handling
+email retrieval by clients. Here’s why Dovecot is used:
+
+* **Secure Email Access**
+
+  Allows users to access their mailboxes securely via IMAP, IMAPS, POP3, and POP3S.
+
+* **High Performance**
+
+  Optimized for speed and efficiency, making it ideal for handling large
+  volumes of email.
+
+* **Authentication Management**
+
+  Integrates with other authentication system, ensuring secure login
+  with various mechanisms (e.g., SQL, LDAP, OAuth2).
+
+* **Mailbox Storage**
+
+  Manages and indexes Maildir storage, allowing for fast email retrieval.
+
+* **Sieve Filtering**
+
+  Supports Sieve for server-side email filtering, allowing users to set
+  up auto-responses, sorting rules, and spam handling.
+
+* **Integration with Other Services**
+
+  Works closely with Postfix (SMTP server) and Rspamd (spam filtering)
+  to provide a full-featured mail system.
+
+Overall, Dovecot ensures a smooth and secure email retrieval experience.
+
+.. _Dovecot: https://www.dovecot.org/
+
+Memcached
+---------
+
+`Memcached`_ is used as a caching layer to improve performance and reduce
+database load. Here’s why it’s included:
+
+* **Reduced Database Load**
+
+  Frequently accessed data, such as authentication tokens and user session
+  details, are cached in Memcached instead of repeatedly querying MySQL.
+
+* **Postfix & Dovecot Integration**
+
+  Some email-related operations, like authentication caching, benefit
+  from Memcached, improving email processing efficiency.
+
+Overall, Memcached helps optimize performance by reducing the need for
+repeated database queries and speeding up email operations.
+
+.. _Memcached: https://memcached.org/
+
 Monit
 -----
 
@@ -126,6 +185,44 @@ In summary, Monit enhances reliability, automated recovery, and service
 uptime, ensuring the mail server remains resilient and functional.
 
 .. _Monit: https://mmonit.com/monit/
+
+Postfix
+-------
+
+`Postfix`_ is a Mail Transfer Agent (MTA) for handling email delivery
+and relay. Here’s why Postfix is chosen and how it fits into the
+architecture:
+
+* **Reliable and Secure MTA**
+
+  Widely used, battle-tested MTA known for its security, performance,
+  and reliability. It has built-in protections against spam and abuse,
+  making it a solid choice for a modern mail server.
+
+* **Handling Incoming and Outgoing Mail**
+
+  Receives emails from the internet (SMTP) and passes them to Dovecot
+  for mailbox storage. Sends emails from local mailboxes to external
+  recipients (SMTP relay).
+
+* **Integration with Other Services**
+
+  Hands off mail to Dovecot for storage and retrieval. Routes emails
+  through Rspamd for spam and virus filtering. When users send emails
+  via SOGo, ensures they are delivered correctly.
+
+* **Performance and Queue Management**
+
+  Optimized for handling high email volumes efficiently. Queues messages
+  properly and retries delivery in case of temporary failures.
+
+* **Support for TLS and Encryption**
+
+  Configured with TLS encryption for secure email transmission. Also
+  supports authentication mechanisms like SPF, DKIM, and DMARC for
+  email security.
+
+.. _Postfix: https://www.postfix.org/
 
 Rspamd
 ------
@@ -177,6 +274,50 @@ capabilities, and ability to integrate with other security systems like
 ClamAV, providing a comprehensive and flexible anti-spam solution.
 
 .. _Rspamd: https://rspamd.com/
+
+SOGo
+----
+
+`SOGo`_ is a webmail, calendar, and contacts (groupware)
+solution. Here’s why it’s included:
+
+* **Webmail Interface**
+
+  Provides a modern and responsive web-based email client.
+
+* **CalDAV & CardDAV Support**
+
+  Users can sync calendars and contacts across multiple devices (e.g.,
+  Thunderbird, Outlook, mobile apps).
+
+* **Shared Mailboxes & Calendars**
+
+  Enables teams to share mail folders, calendars, and address books,
+  making it useful for organizations.
+
+* **ActiveSync Support**
+
+  Allows mobile device synchronization (emails, contacts, and calendars)
+  via Microsoft ActiveSync.
+
+* **Integration with Dovecot & Postfix**
+
+  Connects with Dovecot (IMAP/POP3) and Postfix (SMTP) for seamless
+  email handling.
+
+* **User-friendly UI**
+
+  Provides a polished user interface compared to traditional webmail
+  clients.
+
+* **Multi-language Support**
+
+  Internationalized, making it suitable for diverse users.
+
+Essentially, SOGo provides a full-featured groupware experience, making
+it more than just a webemail client.
+
+.. _SOGo: https://www.sogo.nu/
 
 Unbound
 -------

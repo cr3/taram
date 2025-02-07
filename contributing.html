@@ -254,8 +254,8 @@ test fails without your patch. Run the tests as described below.</p></li>
 <h2>Upgrading the database<a class="headerlink" href="#upgrading-the-database" title="Permalink to this heading"></a></h2>
 <p>Auto-generate up upgrade scripts under the <code class="docutils literal notranslate"><span class="pre">alembic/versions</span></code> directory
 using a service like <code class="docutils literal notranslate"><span class="pre">backend</span></code>:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt; docker compose run -u $(id -u):$(id -g) -v $(pwd)/alembic:/app/alembic backend \
-  alembic revision --autogenerate -m &#39;my message&#39;
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt; docker compose run -u $(id -u):$(id -g) -v $(pwd)/alembic:/app/alembic --build backend \
+  bash -c &quot;alembic upgrade head &amp;&amp; alembic revision --autogenerate -m &#39;my message&#39;&quot;
 </pre></div>
 </div>
 <p>Read more about <a class="reference external" href="https://alembic.sqlalchemy.org/en/latest/">Alembic</a>.</p>

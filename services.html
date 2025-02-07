@@ -53,8 +53,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#backend">Backend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#clamav">ClamAV</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dockerapi">DockerAPI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dovecot">Dovecot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#memcached">Memcached</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#monit">Monit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#postfix">Postfix</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rspamd">Rspamd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sogo">SOGo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#unbound">Unbound</a></li>
 </ul>
 </li>
@@ -174,6 +178,53 @@ trusted network.</p>
 <p>DockerAPI acts as the central mechanism for automating and orchestrating
 container operations in a controlled, and secure manner.</p>
 </section>
+<section id="dovecot">
+<h2>Dovecot<a class="headerlink" href="#dovecot" title="Permalink to this heading"></a></h2>
+<p><a class="reference external" href="https://www.dovecot.org/">Dovecot</a> is an IMAP and POP3 server which is responsible for handling
+email retrieval by clients. Here’s why Dovecot is used:</p>
+<ul>
+<li><p><strong>Secure Email Access</strong></p>
+<p>Allows users to access their mailboxes securely via IMAP, IMAPS, POP3, and POP3S.</p>
+</li>
+<li><p><strong>High Performance</strong></p>
+<p>Optimized for speed and efficiency, making it ideal for handling large
+volumes of email.</p>
+</li>
+<li><p><strong>Authentication Management</strong></p>
+<p>Integrates with other authentication system, ensuring secure login
+with various mechanisms (e.g., SQL, LDAP, OAuth2).</p>
+</li>
+<li><p><strong>Mailbox Storage</strong></p>
+<p>Manages and indexes Maildir storage, allowing for fast email retrieval.</p>
+</li>
+<li><p><strong>Sieve Filtering</strong></p>
+<p>Supports Sieve for server-side email filtering, allowing users to set
+up auto-responses, sorting rules, and spam handling.</p>
+</li>
+<li><p><strong>Integration with Other Services</strong></p>
+<p>Works closely with Postfix (SMTP server) and Rspamd (spam filtering)
+to provide a full-featured mail system.</p>
+</li>
+</ul>
+<p>Overall, Dovecot ensures a smooth and secure email retrieval experience.</p>
+</section>
+<section id="memcached">
+<h2>Memcached<a class="headerlink" href="#memcached" title="Permalink to this heading"></a></h2>
+<p><a class="reference external" href="https://memcached.org/">Memcached</a> is used as a caching layer to improve performance and reduce
+database load. Here’s why it’s included:</p>
+<ul>
+<li><p><strong>Reduced Database Load</strong></p>
+<p>Frequently accessed data, such as authentication tokens and user session
+details, are cached in Memcached instead of repeatedly querying MySQL.</p>
+</li>
+<li><p><strong>Postfix &amp; Dovecot Integration</strong></p>
+<p>Some email-related operations, like authentication caching, benefit
+from Memcached, improving email processing efficiency.</p>
+</li>
+</ul>
+<p>Overall, Memcached helps optimize performance by reducing the need for
+repeated database queries and speeding up email operations.</p>
+</section>
 <section id="monit">
 <h2>Monit<a class="headerlink" href="#monit" title="Permalink to this heading"></a></h2>
 <p><a class="reference external" href="https://mmonit.com/monit/">Monit</a> is used to ensure the reliability and availability of its
@@ -201,6 +252,38 @@ to maintain the proper functioning of the entire mail server stack.</p>
 </ul>
 <p>In summary, Monit enhances reliability, automated recovery, and service
 uptime, ensuring the mail server remains resilient and functional.</p>
+</section>
+<section id="postfix">
+<h2>Postfix<a class="headerlink" href="#postfix" title="Permalink to this heading"></a></h2>
+<p><a class="reference external" href="https://www.postfix.org/">Postfix</a> is a Mail Transfer Agent (MTA) for handling email delivery
+and relay. Here’s why Postfix is chosen and how it fits into the
+architecture:</p>
+<ul>
+<li><p><strong>Reliable and Secure MTA</strong></p>
+<p>Widely used, battle-tested MTA known for its security, performance,
+and reliability. It has built-in protections against spam and abuse,
+making it a solid choice for a modern mail server.</p>
+</li>
+<li><p><strong>Handling Incoming and Outgoing Mail</strong></p>
+<p>Receives emails from the internet (SMTP) and passes them to Dovecot
+for mailbox storage. Sends emails from local mailboxes to external
+recipients (SMTP relay).</p>
+</li>
+<li><p><strong>Integration with Other Services</strong></p>
+<p>Hands off mail to Dovecot for storage and retrieval. Routes emails
+through Rspamd for spam and virus filtering. When users send emails
+via SOGo, ensures they are delivered correctly.</p>
+</li>
+<li><p><strong>Performance and Queue Management</strong></p>
+<p>Optimized for handling high email volumes efficiently. Queues messages
+properly and retries delivery in case of temporary failures.</p>
+</li>
+<li><p><strong>Support for TLS and Encryption</strong></p>
+<p>Configured with TLS encryption for secure email transmission. Also
+supports authentication mechanisms like SPF, DKIM, and DMARC for
+email security.</p>
+</li>
+</ul>
 </section>
 <section id="rspamd">
 <h2>Rspamd<a class="headerlink" href="#rspamd" title="Permalink to this heading"></a></h2>
@@ -244,6 +327,41 @@ of malicious content or spam affecting the system.</p>
 <p>In summary, Rspamd is used for its efficiency, advanced spam filtering
 capabilities, and ability to integrate with other security systems like
 ClamAV, providing a comprehensive and flexible anti-spam solution.</p>
+</section>
+<section id="sogo">
+<h2>SOGo<a class="headerlink" href="#sogo" title="Permalink to this heading"></a></h2>
+<p><a class="reference external" href="https://www.sogo.nu/">SOGo</a> is a webmail, calendar, and contacts (groupware)
+solution. Here’s why it’s included:</p>
+<ul>
+<li><p><strong>Webmail Interface</strong></p>
+<p>Provides a modern and responsive web-based email client.</p>
+</li>
+<li><p><strong>CalDAV &amp; CardDAV Support</strong></p>
+<p>Users can sync calendars and contacts across multiple devices (e.g.,
+Thunderbird, Outlook, mobile apps).</p>
+</li>
+<li><p><strong>Shared Mailboxes &amp; Calendars</strong></p>
+<p>Enables teams to share mail folders, calendars, and address books,
+making it useful for organizations.</p>
+</li>
+<li><p><strong>ActiveSync Support</strong></p>
+<p>Allows mobile device synchronization (emails, contacts, and calendars)
+via Microsoft ActiveSync.</p>
+</li>
+<li><p><strong>Integration with Dovecot &amp; Postfix</strong></p>
+<p>Connects with Dovecot (IMAP/POP3) and Postfix (SMTP) for seamless
+email handling.</p>
+</li>
+<li><p><strong>User-friendly UI</strong></p>
+<p>Provides a polished user interface compared to traditional webmail
+clients.</p>
+</li>
+<li><p><strong>Multi-language Support</strong></p>
+<p>Internationalized, making it suitable for diverse users.</p>
+</li>
+</ul>
+<p>Essentially, SOGo provides a full-featured groupware experience, making
+it more than just a webemail client.</p>
 </section>
 <section id="unbound">
 <h2>Unbound<a class="headerlink" href="#unbound" title="Permalink to this heading"></a></h2>
