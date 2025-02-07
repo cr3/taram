@@ -275,6 +275,50 @@ ClamAV, providing a comprehensive and flexible anti-spam solution.
 
 .. _Rspamd: https://rspamd.com/
 
+SOGo
+----
+
+`SOGo`_ is a webmail, calendar, and contacts (groupware)
+solution. Here’s why it’s included:
+
+* **Webmail Interface**
+
+  Provides a modern and responsive web-based email client.
+
+* **CalDAV & CardDAV Support**
+
+  Users can sync calendars and contacts across multiple devices (e.g.,
+  Thunderbird, Outlook, mobile apps).
+
+* **Shared Mailboxes & Calendars**
+
+  Enables teams to share mail folders, calendars, and address books,
+  making it useful for organizations.
+
+* **ActiveSync Support**
+
+  Allows mobile device synchronization (emails, contacts, and calendars)
+  via Microsoft ActiveSync.
+
+* **Integration with Dovecot & Postfix**
+
+  Connects with Dovecot (IMAP/POP3) and Postfix (SMTP) for seamless
+  email handling.
+
+* **User-friendly UI**
+
+  Provides a polished user interface compared to traditional webmail
+  clients.
+
+* **Multi-language Support**
+
+  Internationalized, making it suitable for diverse users.
+
+Essentially, SOGo provides a full-featured groupware experience, making
+it more than just a webemail client.
+
+.. _SOGo: https://www.sogo.nu/
+
 Unbound
 -------
 
