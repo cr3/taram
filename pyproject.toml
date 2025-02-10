@@ -58,10 +58,12 @@ sphinxcontrib-log-cabinet = "^1.0.1"
 sphinx-rtd-theme = "^1.2.0"
 
 [tool.poetry.plugins."pytest11"]
-taram-db = "taram.testing.db"
 taram = "taram.testing.fixtures"
+taram-db = "taram.testing.db"
 
 [tool.poetry.plugins."pytest_unique"]
+db-model = "taram.testing.unique:unique_db_model"
+db-value = "taram.testing.unique:unique_db_value"
 domain = "taram.testing.unique:unique_domain"
 
 [tool.poetry.scripts]
