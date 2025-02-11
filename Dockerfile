@@ -20,6 +20,7 @@ RUN apt update \
   build-essential \
   curl \
   libmariadb-dev \
+  libmemcached-dev \
   pkg-config \
   && curl -sSL https://install.python-poetry.org | python3 -
 
