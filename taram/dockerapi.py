@@ -4,8 +4,13 @@ from contextlib import asynccontextmanager
 
 import aiodocker
 from attrs import define, field
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    Request,
+)
 from fastapi.responses import JSONResponse
+from fastapi.routing import APIRoute
 
 
 @define(frozen=True)
@@ -121,3 +126,9 @@ async def unicorn_exception_handler(request: Request, exc: Exception):
         {"message": str(exc)},
         status_code=500,
     )
+
+
+# Simplify operation IDs to use route names.
+for route in app.routes:
+    if isinstance(route, APIRoute):
+        route.operation_id = route.name

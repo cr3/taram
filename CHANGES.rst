@@ -1,7 +1,7 @@
 Version 0.2.0
 -------------
 
-Released 2025-02-04
+Released 2025-02-12
 
 -   Add Backend service.
 -   Add Clamd service.
@@ -16,6 +16,7 @@ Released 2025-02-04
 -   Add Rspamd service.
 -   Add SOGo service.
 -   Add Unbound service.
+-   Add command-line interface.
 
 Version 0.1.0
 -------------

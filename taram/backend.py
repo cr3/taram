@@ -4,7 +4,13 @@ import logging
 from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import (
+    Depends,
+    FastAPI,
+    HTTPException,
+    Request,
+)
+from fastapi.routing import APIRoute
 from sqlalchemy.orm import Session
 
 from alembic import command
@@ -73,3 +79,9 @@ def delete_domain(domain: str, session: SessionDep) -> None:
 @app.exception_handler(KeyError)
 async def key_error_handler(request: Request, exc: KeyError):
     raise HTTPException(404, "Domain not found") from exc
+
+
+# Simplify operation IDs to use route names.
+for route in app.routes:
+    if isinstance(route, APIRoute):
+        route.operation_id = route.name
