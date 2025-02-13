@@ -35,7 +35,7 @@ SELECT
    mailbox.username,
    mailbox.domain,
    mailbox.username,
-   IF(JSON_UNQUOTE(JSON_VALUE(attributes, '$.force_pw_update')) = '0', IF(JSON_UNQUOTE(JSON_VALUE(attributes, '$.sogo_access')) = 1, password, '{SSHA256}A123A123A321A321A321B321B321B123B123B321B432F123E321123123321321'), '{SSHA256}A123A123A321A321A321B321B321B123B123B321B432F123E321123123321321'),
+   IF(ua.force_pw_update = '0', IF(ua.sogo_access = 1, password, '{SSHA256}A123A123A321A321A321B321B321B123B123B321B432F123E321123123321321'), '{SSHA256}A123A123A321A321A321B321B321B123B123B321B432F123E321123123321321'),
    mailbox.name,
    mailbox.username,
    IFNULL(GROUP_CONCAT(ga.aliases ORDER BY ga.aliases SEPARATOR ' '), ''),
@@ -45,6 +45,9 @@ SELECT
    mailbox.multiple_bookings
 FROM
    mailbox
+   LEFT OUTER JOIN
+      user_attributes ua
+      ON ua.username = mailbox.username
    LEFT OUTER JOIN
       grouped_mail_aliases ga
       ON ga.username REGEXP CONCAT('(^|,)', mailbox.username, '($|,)')

@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from taram.units import kebi
+from taram.units import gibi, kebi
 
 
 class DomainCreate(BaseModel):
@@ -13,9 +13,9 @@ class DomainCreate(BaseModel):
     description: str = ""
     aliases: int = 400
     mailboxes: int = 10
-    defquota: int = 3 * kebi
-    maxquota: int = 100 * kebi
-    quota: int = 100 * kebi
+    defquota: int = 3 * gibi
+    maxquota: int = 10 * gibi
+    quota: int = 10 * gibi
     active: bool = True
     gal: bool = True
     backupmx: int = False

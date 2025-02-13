@@ -1,13 +1,14 @@
 """SQLAlchemy models."""
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Optional
 
 from sqlalchemy import (
     BigInteger,
     Column,
     DateTime,
     Enum,
+    ForeignKey,
     Index,
     Integer,
     String,
@@ -19,7 +20,8 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 from sqlalchemy.sql import func
-from sqlalchemy.types import JSON
+
+from taram.units import gibi
 
 SQLModel = declarative_base()
 
@@ -94,9 +96,9 @@ class DomainModel(SQLModel):
     description: Mapped[Optional[str]] = mapped_column(String(255))
     aliases: Mapped[int] = mapped_column(Integer, server_default="0")
     mailboxes: Mapped[int] = mapped_column(Integer, server_default="0")
-    defquota: Mapped[int] = mapped_column(BigInteger, server_default="3072")
-    maxquota: Mapped[int] = mapped_column(BigInteger, server_default="102400")
-    quota: Mapped[int] = mapped_column(BigInteger, server_default="102400")
+    defquota: Mapped[int] = mapped_column(BigInteger, server_default=f"{3 * gibi}")
+    maxquota: Mapped[int] = mapped_column(BigInteger, server_default=f"{10 * gibi}")
+    quota: Mapped[int] = mapped_column(BigInteger, server_default=f"{10 * gibi}")
     relayhost: Mapped[str] = mapped_column(String(255), server_default="0")
     backupmx: Mapped[bool] = mapped_column(server_default="0")
     gal: Mapped[bool] = mapped_column(server_default="1")
@@ -143,11 +145,9 @@ class MailboxModel(SQLModel):
     name: Mapped[Optional[str]] = mapped_column(String(255))
     description: Mapped[Optional[str]] = mapped_column(String(255))
     mailbox_path_prefix: Mapped[Optional[str]] = mapped_column(String(150), server_default="/var/mail")
-    quota: Mapped[int] = mapped_column(BigInteger, server_default="102400")
+    quota: Mapped[int] = mapped_column(BigInteger, server_default=f"{10 * gibi}")
     local_part: Mapped[str] = mapped_column(String(255))
     domain: Mapped[str] = mapped_column(String(255))
-    attributes: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON)
-    custom_attributes: Mapped[dict[str, Any]] = mapped_column(JSON, server_default="{}")
     kind: Mapped[str] = mapped_column(String(100), server_default="")
     multiple_bookings: Mapped[int] = mapped_column(Integer, server_default="-1")
     created: datetime = Column(DateTime(timezone=True), server_default=func.current_timestamp())
@@ -221,7 +221,7 @@ class SogoStaticView(SQLModel):
     __tablename__ = "_sogo_static_view"
     __table_args__ = (Index("_sogo_static_view_domain_key", "domain"),)
 
-    c_uid: Mapped[int] = mapped_column(primary_key=True)
+    c_uid: Mapped[str] = mapped_column(String(255), primary_key=True)
     domain: Mapped[str] = mapped_column(String(255))
     c_name: Mapped[str] = mapped_column(String(255))
     c_password: Mapped[str] = mapped_column(String(255), server_default="")
@@ -288,3 +288,44 @@ class TransportsModel(SQLModel):
     password: Mapped[str] = mapped_column(String(255), server_default="")
     is_mx_based: Mapped[bool] = mapped_column(server_default="0")
     active: Mapped[bool] = mapped_column(server_default="1")
+
+
+class UserAclModel(SQLModel):
+
+    __tablename__ = "user_acl"
+
+    username: Mapped[str] = mapped_column(ForeignKey("mailbox.username"), primary_key=True)
+    spam_alias: Mapped[bool] = mapped_column(server_default="1")
+    tls_policy: Mapped[bool] = mapped_column(server_default="1")
+    spam_score: Mapped[bool] = mapped_column(server_default="1")
+    spam_policy: Mapped[bool] = mapped_column(server_default="1")
+    delimiter_action: Mapped[bool] = mapped_column(server_default="1")
+    syncjobs: Mapped[bool] = mapped_column(server_default="0")
+    eas_reset: Mapped[bool] = mapped_column(server_default="1")
+    sogo_profile_reset: Mapped[bool] = mapped_column(server_default="0")
+    pushover: Mapped[bool] = mapped_column(server_default="1")
+    # quarantine is for quarantine actions, todo: rename
+    quarantine: Mapped[bool] = mapped_column(server_default="1")
+    quarantine_attachments: Mapped[bool] = mapped_column(server_default="1")
+    quarantine_notification: Mapped[bool] = mapped_column(server_default="1")
+    quarantine_category: Mapped[bool] = mapped_column(server_default="1")
+    app_passwds: Mapped[bool] = mapped_column(server_default="1")
+    pw_reset: Mapped[bool] = mapped_column(server_default="1")
+
+
+class UserAttributesModel(SQLModel):
+
+    __tablename__ = "user_attributes"
+
+    username: Mapped[str] = mapped_column(ForeignKey("mailbox.username"), primary_key=True)
+    force_pw_update: Mapped[bool] = mapped_column(server_default="0")
+    tls_enforce_in: Mapped[bool] = mapped_column(server_default="0")
+    tls_enforce_out: Mapped[bool] = mapped_column(server_default="0")
+    relayhost: Mapped[bool] = mapped_column(server_default="0")
+    sogo_access: Mapped[bool] = mapped_column(server_default="1")
+    imap_access: Mapped[bool] = mapped_column(server_default="1")
+    pop3_access: Mapped[bool] = mapped_column(server_default="1")
+    smtp_access: Mapped[bool] = mapped_column(server_default="1")
+    sieve_access: Mapped[bool] = mapped_column(server_default="1")
+    quarantine_notification: Mapped[str] = mapped_column(String(255), server_default="hourly")
+    quarantine_category: Mapped[str] = mapped_column(String(255), server_default="reject")

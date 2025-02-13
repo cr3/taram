@@ -1,6 +1,6 @@
 """Database views."""
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.sql import func
 from sqlalchemy_utils.view import (
     CreateView,
@@ -77,7 +77,8 @@ class GroupedDomainAliasAddressView(SQLViewMixin, SQLModel):
         select(
             MailboxModel.username.label("username"),
             func.coalesce(
-                func.group_concat(func.concat(MailboxModel.local_part, "@", AliasDomainModel.alias_domain)), ""
+                func.group_concat(text("mailbox.local_part || '@' || alias_domain.alias_domain")),
+                "",
             ).label("ad_alias"),
         )
         .select_from(

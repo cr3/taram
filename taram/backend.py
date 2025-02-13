@@ -76,6 +76,13 @@ def delete_domain(domain: str, session: SessionDep) -> None:
     session.commit()
 
 
+@app.get("/sogo-auth")
+def get_sogo_auth(response: Response) -> None:
+    response.headers["X-User"] = ""
+    response.headers["X-Auth"] = ""
+    response.headers["X-Auth-Type"] = ""
+
+
 @app.exception_handler(KeyError)
 async def key_error_handler(request: Request, exc: KeyError):
     raise HTTPException(404, "Domain not found") from exc
