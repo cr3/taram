@@ -9,6 +9,7 @@ from fastapi import (
     FastAPI,
     HTTPException,
     Request,
+    Response,
 )
 from fastapi.routing import APIRoute
 from sqlalchemy.orm import Session
@@ -16,7 +17,7 @@ from sqlalchemy.orm import Session
 from alembic import command
 from alembic.config import Config
 from taram.db import get_session
-from taram.mailbox import Mailbox
+from taram.domain import DomainManager
 from taram.schemas import (
     DomainCreate,
     DomainDetails,
@@ -43,13 +44,13 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/domains")
 def get_domains(session: SessionDep) -> list[str]:
-    mailbox = Mailbox(session)
+    mailbox = DomainManager(session)
     return [d.domain for d in mailbox.get_domains()]
 
 
 @app.post("/domains")
 def post_domain(session: SessionDep, domain_create: DomainCreate) -> DomainDetails:
-    mailbox = Mailbox(session)
+    mailbox = DomainManager(session)
     domain = mailbox.create_domain(domain_create)
     session.commit()
     return mailbox.get_domain_details(domain.domain)
@@ -57,13 +58,13 @@ def post_domain(session: SessionDep, domain_create: DomainCreate) -> DomainDetai
 
 @app.get("/domains/{domain}")
 def get_domain(domain: str, session: SessionDep) -> DomainDetails:
-    mailbox = Mailbox(session)
+    mailbox = DomainManager(session)
     return mailbox.get_domain_details(domain)
 
 
 @app.put("/domains/{domain}")
 def put_domain(domain: str, domain_update: DomainUpdate, session: SessionDep) -> DomainDetails:
-    mailbox = Mailbox(session)
+    mailbox = DomainManager(session)
     domain = mailbox.update_domain(domain, domain_update)
     session.commit()
     return mailbox.get_domain_details(domain.domain)
@@ -71,7 +72,7 @@ def put_domain(domain: str, domain_update: DomainUpdate, session: SessionDep) ->
 
 @app.delete("/domains/{domain}")
 def delete_domain(domain: str, session: SessionDep) -> None:
-    mailbox = Mailbox(session)
+    mailbox = DomainManager(session)
     mailbox.delete_domain(domain)
     session.commit()
 
