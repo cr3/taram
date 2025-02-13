@@ -23,6 +23,7 @@ class DomainCreate(BaseModel):
     relay_unknown_only: bool = False
     dkim_selector: str = "dkim"
     key_size: int = 2 * kebi
+    restart_sogo: bool = True
 
 
 class DomainDetails(BaseModel):

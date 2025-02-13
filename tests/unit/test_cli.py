@@ -1,16 +1,19 @@
 """Unit tests for the cli module."""
 
+from unittest.mock import Mock, patch
+
 import pytest
 import responses
-from requests import HTTPError
 
 from taram.cli import (
+    API_URL,
     call_api,
     get_arg_type,
     get_openapi_schema,
     main,
     make_args_parser,
 )
+from taram.http import HTTPSession
 
 
 @pytest.mark.parametrize(
@@ -28,43 +31,25 @@ def test_get_arg_type(arg, expected):
     assert result == expected
 
 
-@responses.activate
-def test_get_openapi_schema_success():
+def test_get_openapi_schema():
     """Getting the OpenAPI schema should return the body of openapi.json."""
     body = {"test": True}
-    responses.add(
-        responses.GET,
-        "http://localhost/openapi.json",
-        json=body,
-        status=200,
-    )
-    result = get_openapi_schema("http://localhost")
+    http_session = HTTPSession("http://localhost/")
+    with patch.object(http_session, "get") as mock_get:
+        mock_get.return_value = Mock(json=Mock(return_value=body))
+        result = get_openapi_schema(http_session)
+
     assert result == body
 
 
-@responses.activate
-def test_get_openapi_schema_error():
-    """Getting the OpenAPI schema should raise on error."""
-    responses.add(
-        responses.GET,
-        "http://localhost/openapi.json",
-        status=404,
-    )
-    with pytest.raises(HTTPError):
-        get_openapi_schema("http://localhost")
-
-
-@responses.activate
 def test_call_api():
     """Calling the API sould make a request with the given method."""
     body = {"test": True}
-    responses.add(
-        responses.GET,
-        "http://localhost/test",
-        json=body,
-        status=200,
-    )
-    result = call_api("GET", "/test", {}, {}, "http://localhost")
+    http_session = HTTPSession("http://localhost/")
+    with patch.object(http_session, "request") as mock_request:
+        mock_request.return_value = Mock(json=Mock(return_value=body))
+        result = call_api(http_session, "GET", "/test", {}, {})
+
     assert result == body
 
 
@@ -93,11 +78,11 @@ def test_main_help(capsys):
     """The main function should output usage when asked for --help."""
     responses.add(
         responses.GET,
-        "http://localhost/openapi.json",
+        f"{API_URL}openapi.json",
         json={},
     )
     with pytest.raises(SystemExit):
-        main(["--help"], "http://localhost")
+        main(["--help"])
 
     captured = capsys.readouterr()
     assert "usage" in captured.out

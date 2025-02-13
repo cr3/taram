@@ -11,15 +11,13 @@ from argparse import (
 from collections import defaultdict
 from textwrap import dedent
 
-import requests
 from lookuper import lookup
 from more_itertools import bucket, only
-from yarl import URL
 
-DEFAULT_API_TIMEOUT = "10"
-DEFAULT_API_URL = "https://taram.ca"
+from taram.http import HTTPSession
 
-API_TIMEOUT = int(os.environ.get("TARAM_API_TIMEOUT", DEFAULT_API_TIMEOUT))
+DEFAULT_API_URL = "https://taram.ca/"
+
 API_URL = os.environ.get("TARAM_API_URL", DEFAULT_API_URL)
 
 
@@ -33,24 +31,21 @@ def get_arg_type(arg, default=str):
     }.get(arg, default)
 
 
-def get_openapi_schema(api_url=API_URL, api_timeout=API_TIMEOUT):
+def get_openapi_schema(session):
     """Get and parse the OpenAPI schema from the API."""
-    openapi_url = URL(api_url) / "openapi.json"
-    response = requests.get(openapi_url, timeout=api_timeout)
-    response.raise_for_status()
-    return json.loads(response.content)
+    response = session.get("openapi.json")
+    return response.json()
 
 
-def call_api(method, path, args, keys, api_url=API_URL):
+def call_api(session, method, path, args, keys):
     """Make an API request with query parameters and request body."""
     values = bucket(args.items(), lambda a: keys.get(a[0]))
     values = defaultdict(dict, {k: dict(values[k]) for k in values})
-    url = URL(api_url).with_path(path.format(**values["path"]))
 
     headers = {"Content-Type": "application/json"} if values["body"] else {}
-    response = requests.request(
+    response = session.request(
         method.upper(),
-        url,
+        path.format(**values["path"]),
         params=values["query"],
         json=values["body"],
         headers=headers,
@@ -62,7 +57,6 @@ def call_api(method, path, args, keys, api_url=API_URL):
 def make_args_parser(schema):
     epilog = dedent(f"""\
     environments:
-      TARAM_API_TIMEOUT Seconds to wait for the API (default: {DEFAULT_API_TIMEOUT})
       TARAM_API_URL     URL of the API (default: {DEFAULT_API_URL})
     """)
     args_parser = ArgumentParser(
@@ -121,17 +115,18 @@ def make_args_parser(schema):
                     )
 
             command_parser.set_defaults(
-                func=lambda args, m=method, p=path, keys=keys: call_api(m, p, args, keys),
+                func=lambda session, args, m=method, p=path, keys=keys: call_api(session, m, p, args, keys),
             )
 
     return args_parser
 
 
-def main(argv=None, api_url=API_URL):
+def main(argv=None):
     """Entry point to the taram command-line interface."""
-    schema = get_openapi_schema(api_url)
+    session = HTTPSession.with_origin(API_URL)
+    schema = get_openapi_schema(session)
     parser = make_args_parser(schema)
     args = parser.parse_args(argv)
-    data = args.func(vars(args))
+    data = args.func(session, vars(args))
     output = json.dumps(data, indent=2)
     args.output.write(output)
