@@ -257,6 +257,161 @@ class SogoStaticView(SQLModel):
     multiple_bookings: Mapped[int] = mapped_column(Integer, server_default="1")
 
 
+class SogoAclModel(SQLModel):
+
+    id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
+    c_folder_id: Mapped[int] = mapped_column()
+    c_object: Mapped[str] = mapped_column(String(255))
+    c_uid: Mapped[str] = mapped_column(String(255))
+    c_role: Mapped[str] = mapped_column(String(80))
+
+    __tablename__ = "sogo_acl"
+    __table_args__ = (
+        Index("sogo_acl_c_folder_id_key", c_folder_id),
+        Index("sogo_acl_c_uid_key", c_uid),
+    )
+
+
+class SogoAlarmsFolderModel(SQLModel):
+
+    id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
+    c_path: Mapped[str] = mapped_column(String(255))
+    c_name: Mapped[str] = mapped_column(String(255))
+    c_uid: Mapped[str] = mapped_column(String(255))
+    c_recurrence_id: Mapped[Optional[int]] = mapped_column()
+    c_alarm_number: Mapped[int] = mapped_column()
+    c_alarm_date: Mapped[int] = mapped_column()
+
+    __tablename__ = "sogo_alarms_folder"
+
+
+class SogoCacheFolderModel(SQLModel):
+
+    c_uid: Mapped[str] = mapped_column(String(255))
+    c_path: Mapped[str] = mapped_column(String(255))
+    c_parent_path: Mapped[Optional[str]] = mapped_column(String(255))
+    c_type: Mapped[int] = mapped_column()
+    c_creationdate: Mapped[int] = mapped_column()
+    c_lastmodified: Mapped[int] = mapped_column()
+    c_version: Mapped[int] = mapped_column(server_default="0")
+    c_deleted: Mapped[bool] = mapped_column(server_default="0")
+    c_content: Mapped[str] = mapped_column(Text)
+
+    __tablename__ = "sogo_cache_folder"
+    __table_args__ = (PrimaryKeyConstraint(c_uid, c_path),)
+
+
+class SogoFolderInfoModel(SQLModel):
+
+    c_folder_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    c_path: Mapped[str] = mapped_column(String(255))
+    c_path1: Mapped[str] = mapped_column(String(255))
+    c_path2: Mapped[Optional[str]] = mapped_column(String(255))
+    c_path3: Mapped[Optional[str]] = mapped_column(String(255))
+    c_path4: Mapped[Optional[str]] = mapped_column(String(255))
+    c_foldername: Mapped[str] = mapped_column(String(255))
+    c_location: Mapped[Optional[str]] = mapped_column(String(2048))
+    c_quick_location: Mapped[Optional[str]] = mapped_column(String(2048))
+    c_acl_location: Mapped[Optional[str]] = mapped_column(String(2048))
+    c_folder_type: Mapped[str] = mapped_column(String(255))
+
+    __tablename__ = "sogo_folder_info"
+    __table_args__ = (Index("sogo_folder_info_c_path_key", c_path, unique=True),)
+
+
+class SogoQuickAppointmentModel(SQLModel):
+
+    c_folder_id: Mapped[int] = mapped_column()
+    c_name: Mapped[str] = mapped_column(String(255))
+    c_uid: Mapped[str] = mapped_column(String(255))
+    c_startdate: Mapped[Optional[int]] = mapped_column()
+    c_enddate: Mapped[Optional[int]] = mapped_column()
+    c_cycleenddate: Mapped[Optional[int]] = mapped_column()
+    c_title: Mapped[str] = mapped_column(String(1000))
+    c_participants: Mapped[Optional[str]] = mapped_column(Text)
+    c_isallday: Mapped[Optional[bool]] = mapped_column()
+    c_iscycle: Mapped[Optional[bool]] = mapped_column()
+    c_cycleinfo: Mapped[Optional[str]] = mapped_column(Text)
+    c_classification: Mapped[int] = mapped_column()
+    c_isopaque: Mapped[bool] = mapped_column()
+    c_status: Mapped[int] = mapped_column()
+    c_priority: Mapped[Optional[int]] = mapped_column()
+    c_location: Mapped[Optional[str]] = mapped_column(String(255))
+    c_orgmail: Mapped[Optional[str]] = mapped_column(String(255))
+    c_partmails: Mapped[Optional[str]] = mapped_column(Text)
+    c_partstates: Mapped[Optional[str]] = mapped_column(Text)
+    c_category: Mapped[Optional[str]] = mapped_column(String(255))
+    c_sequence: Mapped[Optional[int]] = mapped_column()
+    c_component: Mapped[str] = mapped_column(String(10))
+    c_nextalarm: Mapped[Optional[int]] = mapped_column()
+    c_description: Mapped[Optional[str]] = mapped_column(Text)
+
+    __tablename__ = "sogo_quick_appointment"
+    __table_args__ = (PrimaryKeyConstraint(c_folder_id, c_name),)
+
+
+class SogoQuickContactModel(SQLModel):
+
+    c_folder_id: Mapped[int] = mapped_column()
+    c_name: Mapped[str] = mapped_column(String(255))
+    c_givenname: Mapped[Optional[str]] = mapped_column(String(255))
+    c_cn: Mapped[Optional[str]] = mapped_column(String(255))
+    c_sn: Mapped[Optional[str]] = mapped_column(String(255))
+    c_screenname: Mapped[Optional[str]] = mapped_column(String(255))
+    c_l: Mapped[Optional[str]] = mapped_column(String(255))
+    c_mail: Mapped[Optional[str]] = mapped_column(Text)
+    c_o: Mapped[Optional[str]] = mapped_column(String(255))
+    c_ou: Mapped[Optional[str]] = mapped_column(String(255))
+    c_telephonenumber: Mapped[Optional[str]] = mapped_column(String(255))
+    c_categories: Mapped[Optional[str]] = mapped_column(String(255))
+    c_component: Mapped[str] = mapped_column(String(10))
+    c_hascertificate: Mapped[bool] = mapped_column(server_default="0")
+
+    __tablename__ = "sogo_quick_contact"
+    __table_args__ = (PrimaryKeyConstraint(c_folder_id, c_name),)
+
+
+class SogoSessionsFolderModel(SQLModel):
+
+    c_id: Mapped[str] = mapped_column(String(255), primary_key=True)
+    c_value: Mapped[str] = mapped_column(String(255))
+    c_creationdate: Mapped[int] = mapped_column()
+    c_lastseen: Mapped[int] = mapped_column()
+
+    __tablename__ = "sogo_sessions_folder"
+
+
+class SogoStoreModel(SQLModel):
+
+    c_folder_id: Mapped[int] = mapped_column()
+    c_name: Mapped[str] = mapped_column(String(255), server_default="")
+    c_content: Mapped[str] = mapped_column(Text)
+    c_creationdate: Mapped[int] = mapped_column()
+    c_lastmodified: Mapped[int] = mapped_column()
+    c_version: Mapped[int] = mapped_column()
+    c_deleted: Mapped[Optional[int]] = mapped_column()
+
+    __tablename__ = "sogo_store"
+    __table_args__ = (PrimaryKeyConstraint(c_folder_id, c_name),)
+
+
+class SogoAdminModel(SQLModel):
+
+    c_key: Mapped[str] = mapped_column(String(255), primary_key=True, server_default="")
+    c_content: Mapped[str] = mapped_column(Text)
+
+    __tablename__ = "sogo_admin"
+
+
+class SogoUserProfileModel(SQLModel):
+
+    c_uid: Mapped[str] = mapped_column(String(255), primary_key=True)
+    c_defaults: Mapped[Optional[str]] = mapped_column(Text)
+    c_settings: Mapped[Optional[str]] = mapped_column(Text)
+
+    __tablename__ = "sogo_user_profile"
+
+
 class SpamaliasModel(SQLModel):
 
     __tablename__ = "spamalias"
