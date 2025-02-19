@@ -29,12 +29,6 @@ SQLModel = declarative_base()
 
 class AliasModel(SQLModel):
 
-    __tablename__ = "alias"
-    __table_args__ = (
-        Index("alias_address_key", "address", unique=True),
-        Index("alias_domain_key", "domain"),
-    )
-
     id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
     address: Mapped[str] = mapped_column(String(255))
     goto: Mapped[str] = mapped_column(Text)
@@ -50,14 +44,14 @@ class AliasModel(SQLModel):
     sogo_visible: Mapped[bool] = mapped_column(server_default="1")
     active: Mapped[bool] = mapped_column(server_default="0")
 
+    __tablename__ = "alias"
+    __table_args__ = (
+        Index("alias_address_key", address, unique=True),
+        Index("alias_domain_key", domain),
+    )
+
 
 class AliasDomainModel(SQLModel):
-
-    __tablename__ = "alias_domain"
-    __table_args__ = (
-        Index("alias_domain_active_key", "active"),
-        Index("alias_domain_target_domain_key", "target_domain"),
-    )
 
     alias_domain: Mapped[str] = mapped_column(String(255), primary_key=True)
     target_domain: Mapped[str] = mapped_column(String(255))
@@ -69,11 +63,14 @@ class AliasDomainModel(SQLModel):
     )
     active: Mapped[bool] = mapped_column(server_default="1")
 
+    __tablename__ = "alias_domain"
+    __table_args__ = (
+        Index("alias_domain_active_key", active),
+        Index("alias_domain_target_domain_key", target_domain),
+    )
+
 
 class BccMapsModel(SQLModel):
-
-    __tablename__ = "bcc_maps"
-    __table_args__ = (Index("bcc_maps_local_dest_key", "local_dest"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
     local_dest: Mapped[str] = mapped_column(String(255))
@@ -88,10 +85,11 @@ class BccMapsModel(SQLModel):
     )
     active: Mapped[bool] = mapped_column(server_default="1")
 
+    __tablename__ = "bcc_maps"
+    __table_args__ = (Index("bcc_maps_local_dest_key", local_dest),)
+
 
 class DomainModel(SQLModel):
-
-    __tablename__ = "domain"
 
     domain: Mapped[str] = mapped_column(String(255), primary_key=True)
     description: Mapped[Optional[str]] = mapped_column(String(255))
@@ -112,6 +110,8 @@ class DomainModel(SQLModel):
         server_onupdate=func.current_timestamp(),
     )
     active: Mapped[bool] = mapped_column(server_default="1")
+
+    __tablename__ = "domain"
 
     def validate(self):
         if not self.defquota:
@@ -135,12 +135,6 @@ class DomainModel(SQLModel):
 
 class MailboxModel(SQLModel):
 
-    __tablename__ = "mailbox"
-    __table_args__ = (
-        Index("mailbox_domain_key", "domain"),
-        Index("mailbox_kind_key", "kind"),
-    )
-
     username: Mapped[str] = mapped_column(String(255), primary_key=True)
     password: Mapped[str] = mapped_column(String(255))
     name: Mapped[Optional[str]] = mapped_column(String(255))
@@ -159,29 +153,32 @@ class MailboxModel(SQLModel):
     )
     active: Mapped[bool] = mapped_column(server_default="1")
 
+    __tablename__ = "mailbox"
+    __table_args__ = (
+        Index("mailbox_domain_key", domain),
+        Index("mailbox_kind_key", kind),
+    )
+
 
 class Quota2Model(SQLModel):
-
-    __tablename__ = "quota2"
 
     username: Mapped[str] = mapped_column(String(255), primary_key=True)
     bytes: Mapped[int] = mapped_column(BigInteger, server_default="0")  # noqa: A003
     messages: Mapped[int] = mapped_column(BigInteger, server_default="0")
+
+    __tablename__ = "quota2"
 
 
 class Quota2ReplicaModel(SQLModel):
 
-    __tablename__ = "quota2replica"
-
     username: Mapped[str] = mapped_column(String(255), primary_key=True)
     bytes: Mapped[int] = mapped_column(BigInteger, server_default="0")  # noqa: A003
     messages: Mapped[int] = mapped_column(BigInteger, server_default="0")
 
+    __tablename__ = "quota2replica"
+
 
 class RecipientMapsModel(SQLModel):
-
-    __tablename__ = "recipient_maps"
-    __table_args__ = (Index("recipient_maps_old_dest_key", "old_dest"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
     old_dest: Mapped[str] = mapped_column(String(255))
@@ -194,17 +191,20 @@ class RecipientMapsModel(SQLModel):
     )
     active: Mapped[bool] = mapped_column(server_default="0")
 
+    __tablename__ = "recipient_maps"
+    __table_args__ = (Index("recipient_maps_old_dest_key", old_dest),)
+
 
 class RelayHostsModel(SQLModel):
-
-    __tablename__ = "relayhosts"
-    __table_args__ = (Index("relayhosts_hostname_key", "hostname"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
     hostname: Mapped[str] = mapped_column(String(255))
     username: Mapped[str] = mapped_column(String(255))
     password: Mapped[str] = mapped_column(String(255))
     active: Mapped[bool] = mapped_column(server_default="1")
+
+    __tablename__ = "relayhosts"
+    __table_args__ = (Index("relayhosts_hostname_key", hostname),)
 
 
 class SaslLogModel(SQLModel):
@@ -227,18 +227,15 @@ class SaslLogModel(SQLModel):
 
 class SenderAclModel(SQLModel):
 
-    __tablename__ = "sender_acl"
-
     id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
     logged_in_as: Mapped[str] = mapped_column(String(255))
     send_as: Mapped[str] = mapped_column(String(255))
     external: Mapped[bool] = mapped_column(server_default="0")
 
+    __tablename__ = "sender_acl"
+
 
 class SogoStaticView(SQLModel):
-
-    __tablename__ = "_sogo_static_view"
-    __table_args__ = (Index("_sogo_static_view_domain_key", "domain"),)
 
     c_uid: Mapped[str] = mapped_column(String(255), primary_key=True)
     domain: Mapped[str] = mapped_column(String(255))
@@ -255,6 +252,9 @@ class SogoStaticView(SQLModel):
     ext_acl: Mapped[str] = mapped_column(String(6144), server_default="")
     kind: Mapped[str] = mapped_column(String(100), server_default="")
     multiple_bookings: Mapped[int] = mapped_column(Integer, server_default="1")
+
+    __tablename__ = "_sogo_static_view"
+    __table_args__ = (Index("_sogo_static_view_domain_key", domain),)
 
 
 class SogoAclModel(SQLModel):
@@ -414,8 +414,6 @@ class SogoUserProfileModel(SQLModel):
 
 class SpamaliasModel(SQLModel):
 
-    __tablename__ = "spamalias"
-
     address: Mapped[str] = mapped_column(String(255), primary_key=True)
     goto: Mapped[str] = mapped_column(Text)
     created: datetime = Column(DateTime(timezone=True), server_default=func.current_timestamp())
@@ -426,11 +424,10 @@ class SpamaliasModel(SQLModel):
     )
     validity: Mapped[int] = mapped_column(Integer)
 
+    __tablename__ = "spamalias"
+
 
 class TlsPolicyOverrideModel(SQLModel):
-
-    __tablename__ = "tls_policy_override"
-    __table_args__ = (Index("tls_policy_override_dest_key", "dest"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
     dest: Mapped[str] = mapped_column(String(255))
@@ -446,14 +443,11 @@ class TlsPolicyOverrideModel(SQLModel):
     )
     active: Mapped[bool] = mapped_column(server_default="1")
 
+    __tablename__ = "tls_policy_override"
+    __table_args__ = (Index("tls_policy_override_dest_key", dest),)
+
 
 class TransportsModel(SQLModel):
-
-    __tablename__ = "transports"
-    __table_args__ = (
-        Index("transports_destination_key", "destination"),
-        Index("transports_nexthop_key", "nexthop"),
-    )
 
     id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
     destination: Mapped[str] = mapped_column(String(255))
@@ -463,10 +457,14 @@ class TransportsModel(SQLModel):
     is_mx_based: Mapped[bool] = mapped_column(server_default="0")
     active: Mapped[bool] = mapped_column(server_default="1")
 
+    __tablename__ = "transports"
+    __table_args__ = (
+        Index("transports_destination_key", destination),
+        Index("transports_nexthop_key", nexthop),
+    )
+
 
 class UserAclModel(SQLModel):
-
-    __tablename__ = "user_acl"
 
     username: Mapped[str] = mapped_column(ForeignKey("mailbox.username"), primary_key=True)
     spam_alias: Mapped[bool] = mapped_column(server_default="1")
@@ -486,10 +484,10 @@ class UserAclModel(SQLModel):
     app_passwds: Mapped[bool] = mapped_column(server_default="1")
     pw_reset: Mapped[bool] = mapped_column(server_default="1")
 
+    __tablename__ = "user_acl"
+
 
 class UserAttributesModel(SQLModel):
-
-    __tablename__ = "user_attributes"
 
     username: Mapped[str] = mapped_column(ForeignKey("mailbox.username"), primary_key=True)
     force_pw_update: Mapped[bool] = mapped_column(server_default="0")
@@ -503,3 +501,5 @@ class UserAttributesModel(SQLModel):
     sieve_access: Mapped[bool] = mapped_column(server_default="1")
     quarantine_notification: Mapped[str] = mapped_column(String(255), server_default="hourly")
     quarantine_category: Mapped[str] = mapped_column(String(255), server_default="reject")
+
+    __tablename__ = "user_attributes"
