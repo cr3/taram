@@ -11,6 +11,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    PrimaryKeyConstraint,
     String,
     Text,
 )
@@ -206,6 +207,24 @@ class RelayHostsModel(SQLModel):
     active: Mapped[bool] = mapped_column(server_default="1")
 
 
+class SaslLogModel(SQLModel):
+
+    app_password: Mapped[int] = mapped_column()
+    service: Mapped[str] = mapped_column(String(32))
+    username: Mapped[str] = mapped_column(String(255))
+    real_ip: Mapped[str] = mapped_column(String(64))
+    datetime: datetime = Column(DateTime(timezone=True), server_default=func.current_timestamp())
+
+    __tablename__ = "sasl_log"
+    __table_args__ = (
+        PrimaryKeyConstraint(service, real_ip, username),
+        Index("sasl_log_username_key", username),
+        Index("sasl_log_service_key", service),
+        Index("sasl_log_datetime_key", datetime),
+        Index("sasl_log_real_ip_key", real_ip),
+    )
+
+
 class SenderAclModel(SQLModel):
 
     __tablename__ = "sender_acl"
@@ -304,7 +323,7 @@ class UserAclModel(SQLModel):
     eas_reset: Mapped[bool] = mapped_column(server_default="1")
     sogo_profile_reset: Mapped[bool] = mapped_column(server_default="0")
     pushover: Mapped[bool] = mapped_column(server_default="1")
-    # quarantine is for quarantine actions, todo: rename
+    # TODO: rename quarantine to quarantine_actions
     quarantine: Mapped[bool] = mapped_column(server_default="1")
     quarantine_attachments: Mapped[bool] = mapped_column(server_default="1")
     quarantine_notification: Mapped[bool] = mapped_column(server_default="1")
