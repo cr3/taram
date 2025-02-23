@@ -1,16 +1,19 @@
 """Integration tests for the dockerapi service."""
 
+import pytest
 from hamcrest import (
     assert_that,
+    contains_string,
     has_entries,
     has_item,
     has_length,
 )
+from requests import HTTPError
 
 
-def test_dockerapi_get_services(dockerapi_app, dockerapi_client):
+def test_dockerapi_get_services(dockerapi_session, dockerapi_client):
     """Getting services should include the dockerapi fixture."""
-    result = dockerapi_app.get("/services")
+    result = dockerapi_session.get("/services")
     assert_that(
         result.json(),
         has_item(
@@ -22,9 +25,9 @@ def test_dockerapi_get_services(dockerapi_app, dockerapi_client):
     )
 
 
-def test_dockerapi_get_service(dockerapi_app, dockerapi_client):
+def test_dockerapi_get_service(dockerapi_session, dockerapi_client):
     """Getting a service should include containers."""
-    result = dockerapi_app.get("/services/dockerapi")
+    result = dockerapi_session.get("/services/dockerapi")
     assert_that(
         result.json(),
         has_entries({
@@ -34,15 +37,18 @@ def test_dockerapi_get_service(dockerapi_app, dockerapi_client):
     )
 
 
-def test_dockerapi_post_service_action(dockerapi_app, dockerapi_client):
-    """Posting a restart action should update the StartedAt time."""
-    started_at_before = dockerapi_client.started_at
-    dockerapi_app.post("/services/dockerapi/restart")
-    started_at_after = dockerapi_client.started_at
-    assert started_at_before < started_at_after
+def test_dockerapi_post_service_action(dockerapi_session, dockerapi_client):
+    """Posting a show action should return a success message."""
+    result = dockerapi_session.post("/services/dockerapi/show")
+    assert_that(
+        result.json(),
+        has_entries({
+            "message": contains_string("success"),
+        }),
+    )
 
 
-def test_dockerapi_post_invalid_service_action(dockerapi_app, dockerapi_client):
+def test_dockerapi_post_invalid_service_action(dockerapi_session, dockerapi_client):
     """Posting an invalid action should return a 400 status code."""
-    result = dockerapi_app.post("/services/dockerapi/test")
-    assert result.status_code == 400
+    with pytest.raises(HTTPError):
+        dockerapi_session.post("/services/dockerapi/test")

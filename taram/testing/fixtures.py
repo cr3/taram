@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
+from taram.http import HTTPSession
 from taram.logger import setup_logger
 from taram.testing.compose import ComposeServer
 from taram.testing.logger import LoggerHandler
@@ -112,6 +113,11 @@ def dockerapi_client(env_file, project, process):
     )
     with server.run("dockerapi") as client:
         yield client
+
+
+@pytest.fixture(scope="session")
+def dockerapi_session(dockerapi_client):
+    return HTTPSession.with_origin(f"http://{dockerapi_client.ip}/")
 
 
 @pytest.fixture(scope="session")
