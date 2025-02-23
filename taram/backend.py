@@ -1,7 +1,6 @@
 """Backend API."""
 
 import logging
-from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import (
@@ -14,8 +13,6 @@ from fastapi import (
 from fastapi.routing import APIRoute
 from sqlalchemy.orm import Session
 
-from alembic import command
-from alembic.config import Config
 from taram.db import get_session
 from taram.domain import DomainManager
 from taram.schemas import (
@@ -26,20 +23,9 @@ from taram.schemas import (
 
 logger = logging.getLogger("uvicorn")
 
-
 SessionDep = Annotated[Session, Depends(get_session)]
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    logger.info("Upgrading database")
-    alembic_cfg = Config("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
-
-    yield
-
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 
 @app.get("/domains")

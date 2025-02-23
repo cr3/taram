@@ -1,11 +1,12 @@
 """SQLAlchemy models."""
 
-from datetime import datetime
+import re
+from datetime import datetime as dt
 from typing import Optional
 
 from sqlalchemy import (
+    TIMESTAMP,
     BigInteger,
-    Column,
     DateTime,
     Enum,
     ForeignKey,
@@ -14,12 +15,17 @@ from sqlalchemy import (
     PrimaryKeyConstraint,
     String,
     Text,
+    TextClause,
+    text,
 )
+from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import (
     Mapped,
     declarative_base,
+    declarative_mixin,
     mapped_column,
 )
+from sqlalchemy.schema import FetchedValue
 from sqlalchemy.sql import func
 
 from taram.units import gibi
@@ -27,18 +33,36 @@ from taram.units import gibi
 SQLModel = declarative_base()
 
 
-class AliasModel(SQLModel):
+@compiles(DateTime, "sqlite")
+def sqlite_datetime(element, compiler, **kw):
+    """Replace CURRENT_TIMESTAMP string with function in SQLite server default."""
+    arg = kw["type_expression"].server_default.arg
+    if isinstance(arg, TextClause) and " ON UPDATE " in arg.text:
+        arg.text = re.sub(" ON UPDATE .*", "", arg.text)
+
+    return compiler.visit_datetime(element, **kw)
+
+
+@declarative_mixin
+class TimestampMixin:
+
+    created: Mapped[dt] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.current_timestamp(),
+    )
+    modified: Mapped[dt] = mapped_column(
+        DateTime(timezone=True),
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue(),
+    )
+
+
+class AliasModel(TimestampMixin, SQLModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
     address: Mapped[str] = mapped_column(String(255))
     goto: Mapped[str] = mapped_column(Text)
     domain: Mapped[str] = mapped_column(String(255))
-    created: datetime = Column(DateTime(timezone=True), server_default=func.current_timestamp())
-    modified: datetime = Column(
-        DateTime(timezone=True),
-        server_default=func.current_timestamp(),
-        server_onupdate=func.current_timestamp(),
-    )
     private_comment: Mapped[Optional[str]] = mapped_column(Text)
     public_comment: Mapped[Optional[str]] = mapped_column(Text)
     sogo_visible: Mapped[bool] = mapped_column(server_default="1")
@@ -51,16 +75,10 @@ class AliasModel(SQLModel):
     )
 
 
-class AliasDomainModel(SQLModel):
+class AliasDomainModel(TimestampMixin, SQLModel):
 
     alias_domain: Mapped[str] = mapped_column(String(255), primary_key=True)
     target_domain: Mapped[str] = mapped_column(String(255))
-    created: datetime = Column(DateTime(timezone=True), server_default=func.current_timestamp())
-    modified: datetime = Column(
-        DateTime(timezone=True),
-        server_default=func.current_timestamp(),
-        server_onupdate=func.current_timestamp(),
-    )
     active: Mapped[bool] = mapped_column(server_default="1")
 
     __tablename__ = "alias_domain"
@@ -70,26 +88,44 @@ class AliasDomainModel(SQLModel):
     )
 
 
-class BccMapsModel(SQLModel):
+class AppPasswdModel(TimestampMixin, SQLModel):
+
+    id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
+    name: Mapped[str] = mapped_column(String(255))
+    mailbox: Mapped[str] = mapped_column(String(255))
+    mailbox: Mapped[str] = mapped_column(ForeignKey("mailbox.username", ondelete="CASCADE"))
+    domain: Mapped[str] = mapped_column(String(255))
+    password: Mapped[str] = mapped_column(String(255))
+    imap_access: Mapped[bool] = mapped_column(server_default="1")
+    smtp_access: Mapped[bool] = mapped_column(server_default="1")
+    dav_access: Mapped[bool] = mapped_column(server_default="1")
+    eas_access: Mapped[bool] = mapped_column(server_default="1")
+    pop3_access: Mapped[bool] = mapped_column(server_default="1")
+    sieve_access: Mapped[bool] = mapped_column(server_default="1")
+    active: Mapped[bool] = mapped_column(server_default="1")
+
+    __tablename__ = "app_passwd"
+    __table_args__ = (
+        Index("app_passwd_mailbox", mailbox),
+        Index("app_passwd_password", password),
+        Index("app_passwd_domain", domain),
+    )
+
+
+class BccMapsModel(TimestampMixin, SQLModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
     local_dest: Mapped[str] = mapped_column(String(255))
     bcc_dest: Mapped[str] = mapped_column(String(255))
     domain: Mapped[str] = mapped_column(String(255))
     type: Mapped[Optional[str]] = mapped_column(Enum("sender", "rcpt"))  # noqa: A003
-    created: datetime = Column(DateTime(timezone=True), server_default=func.current_timestamp())
-    modified: datetime = Column(
-        DateTime(timezone=True),
-        server_default=func.current_timestamp(),
-        server_onupdate=func.current_timestamp(),
-    )
     active: Mapped[bool] = mapped_column(server_default="1")
 
     __tablename__ = "bcc_maps"
     __table_args__ = (Index("bcc_maps_local_dest_key", local_dest),)
 
 
-class DomainModel(SQLModel):
+class DomainModel(TimestampMixin, SQLModel):
 
     domain: Mapped[str] = mapped_column(String(255), primary_key=True)
     description: Mapped[Optional[str]] = mapped_column(String(255))
@@ -103,12 +139,6 @@ class DomainModel(SQLModel):
     gal: Mapped[bool] = mapped_column(server_default="1")
     relay_all_recipients: Mapped[bool] = mapped_column(server_default="0")
     relay_unknown_only: Mapped[bool] = mapped_column(server_default="0")
-    created: datetime = Column(DateTime(timezone=True), server_default=func.current_timestamp())
-    modified: datetime = Column(
-        DateTime(timezone=True),
-        server_default=func.current_timestamp(),
-        server_onupdate=func.current_timestamp(),
-    )
     active: Mapped[bool] = mapped_column(server_default="1")
 
     __tablename__ = "domain"
@@ -133,7 +163,7 @@ class DomainModel(SQLModel):
         return self
 
 
-class MailboxModel(SQLModel):
+class MailboxModel(TimestampMixin, SQLModel):
 
     username: Mapped[str] = mapped_column(String(255), primary_key=True)
     password: Mapped[str] = mapped_column(String(255))
@@ -145,17 +175,12 @@ class MailboxModel(SQLModel):
     domain: Mapped[str] = mapped_column(String(255))
     kind: Mapped[str] = mapped_column(String(100), server_default="")
     multiple_bookings: Mapped[int] = mapped_column(Integer, server_default="-1")
-    created: datetime = Column(DateTime(timezone=True), server_default=func.current_timestamp())
-    modified: datetime = Column(
-        DateTime(timezone=True),
-        server_default=func.current_timestamp(),
-        server_onupdate=func.current_timestamp(),
-    )
     active: Mapped[bool] = mapped_column(server_default="1")
 
     __tablename__ = "mailbox"
     __table_args__ = (
         Index("mailbox_domain_key", domain),
+        Index("mailbox_domain_local_part_key", domain, local_part, unique=True),
         Index("mailbox_kind_key", kind),
     )
 
@@ -178,17 +203,11 @@ class Quota2ReplicaModel(SQLModel):
     __tablename__ = "quota2replica"
 
 
-class RecipientMapsModel(SQLModel):
+class RecipientMapsModel(TimestampMixin, SQLModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
     old_dest: Mapped[str] = mapped_column(String(255))
     new_dest: Mapped[str] = mapped_column(String(255))
-    created: datetime = Column(DateTime(timezone=True), server_default=func.current_timestamp())
-    modified: datetime = Column(
-        DateTime(timezone=True),
-        server_default=func.current_timestamp(),
-        server_onupdate=func.current_timestamp(),
-    )
     active: Mapped[bool] = mapped_column(server_default="0")
 
     __tablename__ = "recipient_maps"
@@ -213,7 +232,10 @@ class SaslLogModel(SQLModel):
     service: Mapped[str] = mapped_column(String(32))
     username: Mapped[str] = mapped_column(String(255))
     real_ip: Mapped[str] = mapped_column(String(64))
-    datetime: datetime = Column(DateTime(timezone=True), server_default=func.current_timestamp())
+    datetime: Mapped[dt] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.current_timestamp(),
+    )
 
     __tablename__ = "sasl_log"
     __table_args__ = (
@@ -412,22 +434,16 @@ class SogoUserProfileModel(SQLModel):
     __tablename__ = "sogo_user_profile"
 
 
-class SpamaliasModel(SQLModel):
+class SpamaliasModel(TimestampMixin, SQLModel):
 
     address: Mapped[str] = mapped_column(String(255), primary_key=True)
     goto: Mapped[str] = mapped_column(Text)
-    created: datetime = Column(DateTime(timezone=True), server_default=func.current_timestamp())
-    modified: datetime = Column(
-        DateTime(timezone=True),
-        server_default=func.current_timestamp(),
-        server_onupdate=func.current_timestamp(),
-    )
     validity: Mapped[int] = mapped_column(Integer)
 
     __tablename__ = "spamalias"
 
 
-class TlsPolicyOverrideModel(SQLModel):
+class TlsPolicyOverrideModel(TimestampMixin, SQLModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
     dest: Mapped[str] = mapped_column(String(255))
@@ -435,12 +451,6 @@ class TlsPolicyOverrideModel(SQLModel):
         Enum("none", "may", "encrypt", "dane", "dane-only", "fingerprint", "verify", "secure")
     )
     parameters: Mapped[Optional[str]] = mapped_column(String(255), server_default="")
-    created: datetime = Column(DateTime(timezone=True), server_default=func.current_timestamp())
-    modified: datetime = Column(
-        DateTime(timezone=True),
-        server_default=func.current_timestamp(),
-        server_onupdate=func.current_timestamp(),
-    )
     active: Mapped[bool] = mapped_column(server_default="1")
 
     __tablename__ = "tls_policy_override"
@@ -493,13 +503,15 @@ class UserAttributesModel(SQLModel):
     force_pw_update: Mapped[bool] = mapped_column(server_default="0")
     tls_enforce_in: Mapped[bool] = mapped_column(server_default="0")
     tls_enforce_out: Mapped[bool] = mapped_column(server_default="0")
-    relayhost: Mapped[bool] = mapped_column(server_default="0")
+    relayhost: Mapped[int] = mapped_column(server_default="0")
     sogo_access: Mapped[bool] = mapped_column(server_default="1")
     imap_access: Mapped[bool] = mapped_column(server_default="1")
     pop3_access: Mapped[bool] = mapped_column(server_default="1")
     smtp_access: Mapped[bool] = mapped_column(server_default="1")
     sieve_access: Mapped[bool] = mapped_column(server_default="1")
-    quarantine_notification: Mapped[str] = mapped_column(String(255), server_default="hourly")
-    quarantine_category: Mapped[str] = mapped_column(String(255), server_default="reject")
+    quarantine_notification: Mapped[str] = mapped_column(
+        Enum("never", "hourly", "daily", "weekly"), server_default="hourly"
+    )
+    quarantine_category: Mapped[str] = mapped_column(Enum("add_header", "reject", "all"), server_default="reject")
 
     __tablename__ = "user_attributes"

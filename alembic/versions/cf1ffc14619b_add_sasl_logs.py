@@ -28,7 +28,7 @@ def upgrade() -> None:
         sa.Column("service", sa.String(length=32), nullable=False),
         sa.Column("username", sa.String(length=255), nullable=False),
         sa.Column("real_ip", sa.String(length=64), nullable=False),
-        sa.Column("datetime", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
+        sa.Column("datetime", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
         sa.PrimaryKeyConstraint("service", "real_ip", "username"),
     )
     op.create_index("sasl_log_datetime_key", "sasl_log", ["datetime"], unique=False)

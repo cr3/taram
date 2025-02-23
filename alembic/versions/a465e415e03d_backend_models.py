@@ -28,8 +28,13 @@ def upgrade() -> None:
         sa.Column("address", sa.String(length=255), nullable=False),
         sa.Column("goto", sa.Text(), nullable=False),
         sa.Column("domain", sa.String(length=255), nullable=False),
-        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
-        sa.Column("modified", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
+        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column(
+            "modified",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+            nullable=False,
+        ),
         sa.Column("private_comment", sa.Text(), nullable=True),
         sa.Column("public_comment", sa.Text(), nullable=True),
         sa.Column("sogo_visible", sa.Boolean(), server_default="1", nullable=False),
@@ -42,8 +47,13 @@ def upgrade() -> None:
         "alias_domain",
         sa.Column("alias_domain", sa.String(length=255), nullable=False),
         sa.Column("target_domain", sa.String(length=255), nullable=False),
-        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
-        sa.Column("modified", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
+        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column(
+            "modified",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+            nullable=False,
+        ),
         sa.Column("active", sa.Boolean(), server_default="1", nullable=False),
         sa.PrimaryKeyConstraint("alias_domain"),
     )
@@ -56,8 +66,13 @@ def upgrade() -> None:
         sa.Column("bcc_dest", sa.String(length=255), nullable=False),
         sa.Column("domain", sa.String(length=255), nullable=False),
         sa.Column("type", sa.Enum("sender", "rcpt"), nullable=True),
-        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
-        sa.Column("modified", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
+        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column(
+            "modified",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+            nullable=False,
+        ),
         sa.Column("active", sa.Boolean(), server_default="1", nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -76,8 +91,13 @@ def upgrade() -> None:
         sa.Column("gal", sa.Boolean(), server_default="1", nullable=False),
         sa.Column("relay_all_recipients", sa.Boolean(), server_default="0", nullable=False),
         sa.Column("relay_unknown_only", sa.Boolean(), server_default="0", nullable=False),
-        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
-        sa.Column("modified", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
+        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column(
+            "modified",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+            nullable=False,
+        ),
         sa.Column("active", sa.Boolean(), server_default="1", nullable=False),
         sa.PrimaryKeyConstraint("domain"),
     )
@@ -95,12 +115,18 @@ def upgrade() -> None:
         sa.Column("custom_attributes", sa.JSON(), server_default="{}", nullable=False),
         sa.Column("kind", sa.String(length=100), server_default="", nullable=False),
         sa.Column("multiple_bookings", sa.Integer(), server_default="-1", nullable=False),
-        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
-        sa.Column("modified", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
+        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column(
+            "modified",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+            nullable=False,
+        ),
         sa.Column("active", sa.Boolean(), server_default="1", nullable=False),
         sa.PrimaryKeyConstraint("username"),
     )
     op.create_index("mailbox_domain_key", "mailbox", ["domain"], unique=False)
+    op.create_index("mailbox_domain_local_part_key", "mailbox", ["domain", "local_part"], unique=True)
     op.create_index("mailbox_kind_key", "mailbox", ["kind"], unique=False)
     op.create_table(
         "quota2",
@@ -121,8 +147,13 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("old_dest", sa.String(length=255), nullable=False),
         sa.Column("new_dest", sa.String(length=255), nullable=False),
-        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
-        sa.Column("modified", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
+        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column(
+            "modified",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+            nullable=False,
+        ),
         sa.Column("active", sa.Boolean(), server_default="0", nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -149,8 +180,13 @@ def upgrade() -> None:
         "spamalias",
         sa.Column("address", sa.String(length=255), nullable=False),
         sa.Column("goto", sa.Text(), nullable=False),
-        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
-        sa.Column("modified", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
+        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column(
+            "modified",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+            nullable=False,
+        ),
         sa.Column("validity", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("address"),
     )
@@ -164,8 +200,13 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("parameters", sa.String(length=255), server_default="", nullable=True),
-        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
-        sa.Column("modified", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
+        sa.Column("created", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column(
+            "modified",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+            nullable=False,
+        ),
         sa.Column("active", sa.Boolean(), server_default="1", nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -202,6 +243,7 @@ def downgrade() -> None:
     op.drop_table("quota2replica")
     op.drop_table("quota2")
     op.drop_index("mailbox_kind_key", table_name="mailbox")
+    op.drop_index("mailbox_domain_local_part_key", table_name="mailbox")
     op.drop_index("mailbox_domain_key", table_name="mailbox")
     op.drop_table("mailbox")
     op.drop_table("domain")
