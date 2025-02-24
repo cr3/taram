@@ -1,217 +1,257 @@
-from contextlib import suppress
-
-from attrs import define
-from sqlalchemy import or_, select
-from sqlalchemy.exc import NoResultFound
+from attrs import Factory, define, field
+from passlib.hash import bcrypt
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 
 from taram.models import (
-    AliasDomainModel,
     AliasModel,
     BccMapsModel,
     DomainModel,
+    FilterconfModel,
+    ImapsyncModel,
     MailboxModel,
     Quota2Model,
     Quota2ReplicaModel,
+    SaslLogModel,
     SenderAclModel,
     SpamaliasModel,
+    UserAclModel,
+    UserAttributesModel,
 )
 from taram.schemas import (
-    DomainCreate,
-    DomainDetails,
-    DomainUpdate,
+    MailboxCreate,
+    MailboxDetails,
+    MailboxUpdate,
 )
-
-mebi = 1024**2
+from taram.sogo import Sogo
+from taram.units import mebi
 
 
 @define(frozen=True)
-class Mailbox:
+class MailboxManager:
 
-    session: Session
+    db_session: Session
+    sogo: Sogo = field(
+        default=Factory(lambda self: Sogo(self.db_session), takes_self=True),
+    )
 
-    def get_origin_domain(self, domain):
-        with suppress(NoResultFound):
-            domain = self.session.query(AliasDomainModel).filter_by(alias_domain=domain).one().target_domain
-
-        return domain
-
-    def get_domain_details(self, domain):
-        domain = self.get_origin_domain(domain)
-        try:
-            model = self.session.query(DomainModel).filter_by(domain=domain).one()
-        except NoResultFound as e:
-            raise KeyError(f"Domain not found: {domain}") from e
-
-        mailbox_data_domain = self._get_mailbox_data_domain(domain)
-        sum_quota_in_use = self._get_sum_quota_in_use(domain)
-
-        max_new_mailbox_quota = max(model.quota * mebi - mailbox_data_domain.in_use, model.maxquota * mebi)
-        def_new_mailbox_quota = max(max_new_mailbox_quota, model.defquota * mebi)
-        quota_used_in_domain = mailbox_data_domain.in_use
-        bytes_total = sum_quota_in_use.bytes_total or 0
-        msgs_total = sum_quota_in_use.msgs_total or 0
-
-        alias_data_domain = self._get_alias_data_domain(domain)
-        aliases_in_domain = alias_data_domain.alias_count or 0
-        aliases_left = model.aliases - aliases_in_domain
-
-        return DomainDetails(
-            max_new_mailbox_quota=max_new_mailbox_quota,
-            def_new_mailbox_quota=def_new_mailbox_quota,
-            quota_used_in_domain=quota_used_in_domain,
-            bytes_total=bytes_total,
-            msgs_total=msgs_total,
-            mboxes_in_domain=mailbox_data_domain.count,
-            mboxes_left=model.mailboxes - mailbox_data_domain.count,
-            domain=model.domain,
-            description=model.description,
-            max_num_aliases_for_domain=model.aliases,
-            max_num_mboxes_for_domain=model.mailboxes,
-            def_quota_for_mbox=model.defquota * mebi,
-            max_quota_for_mbox=model.maxquota * mebi,
-            max_quota_for_domain=model.quota * mebi,
-            relayhost=model.relayhost,
-            backupmx=model.backupmx,
-            gal=model.gal,
-            active=model.active,
-            relay_all_recipients=model.relay_all_recipients,
-            relay_unknown_only=model.relay_unknown_only,
-            aliases_in_domain=aliases_in_domain,
-            aliases_left=aliases_left,
+    def get_mailbox_details(self, username):
+        mailbox, quota2, attributes = (
+            self.db_session.query(MailboxModel, Quota2Model, UserAttributesModel)
+            .filter_by(kind="", username=username)
+            .join(Quota2Model, Quota2Model.username == MailboxModel.username)
+            .join(UserAttributesModel, UserAttributesModel.username == MailboxModel.username)
+            .one()
         )
 
-    def get_domains(self):
-        return self.session.query(DomainModel).filter_by(active=True).all()
+        logs = (
+            self.db_session.query(func.max(SaslLogModel.datetime), SaslLogModel.service)
+            .filter_by(username=username)
+            .order_by(SaslLogModel.service.desc())
+            .all()
+        )
+        last_logins = {service: datetime for datetime, service in logs}
 
-    def create_domain(self, domain_create: DomainCreate):
-        domain = domain_create.domain.lower().strip()
-        if self.session.query(DomainModel).filter_by(domain=domain).count():
-            raise KeyError("domain exists already")
+        # TODO: ratelimit
 
-        model = DomainModel(
-            domain=domain,
-            description=domain_create.description or domain,
-            aliases=domain_create.aliases,
-            mailboxes=domain_create.mailboxes,
-            defquota=domain_create.defquota,
-            maxquota=domain_create.maxquota,
-            quota=domain_create.quota,
-            backupmx=domain_create.backupmx,
-            gal=domain_create.gal,
-            relay_all_recipients=domain_create.relay_all_recipients,
-            relay_unknown_only=domain_create.relay_unknown_only,
-            active=domain_create.active,
-        ).validate()
+        return MailboxDetails(
+            username=mailbox.username,
+            active=mailbox.active,
+            domain=mailbox.domain,
+            name=mailbox.name,
+            local_part=mailbox.local_part,
+            quota=mailbox.quota,
+            quota_used=quota2.bytes,
+            messages=quota2.messages,
+            quarantine_notification=attributes.quarantine_notification,
+            quarantine_category=attributes.quarantine_category,
+            force_pw_update=attributes.force_pw_update,
+            tls_enforce_in=attributes.tls_enforce_in,
+            tls_enforce_out=attributes.tls_enforce_out,
+            relayhost=attributes.relayhost,
+            sogo_access=attributes.sogo_access,
+            imap_access=attributes.imap_access,
+            pop3_access=attributes.pop3_access,
+            smtp_access=attributes.smtp_access,
+            sieve_access=attributes.sieve_access,
+            last_imap_login=last_logins.get("imap"),
+            last_smtp_login=last_logins.get("smtp"),
+            last_pop3_login=last_logins.get("pop3"),
+            last_sso_login=last_logins.get("SSO"),
+        )
 
-        self.session.query(SenderAclModel).filter(
-            SenderAclModel.external == 1,
-            SenderAclModel.send_as.like(f"%@{model.domain}"),
-        ).delete()
-        self.session.add(model)
-        # TODO: hset DOMAIN_MAP, dkim, sogo
+    def create_mailbox(self, mailbox_create: MailboxCreate):
+        local_part = mailbox_create.local_part.lower().strip()
+        if not local_part:
+            raise ValueError("local_part empty")
 
-        return model
+        domain = mailbox_create.domain.lower().strip()
+        username = f"{local_part}@{domain}"
+        # validate username as email
+        name = mailbox_create.name or local_part
+        name = name.lstrip("<").rstrip(">")
 
-    def update_domain(self, domain, domain_update: DomainUpdate):
-        details = self.get_domain_details(domain)
-        model = self.session.query(DomainModel).filter_by(domain=domain).one()
-        model.mailoxes = details.max_num_mboxes_for_domain
-        model.defquota = details.def_quota_for_mbox / mebi
-        model.maxquota = details.max_quota_for_mbox / mebi
-        model.quota = details.max_quota_for_domain / mebi
-        for key, value in domain_update.model_dump().items():
-            if value is not None:
-                setattr(model, key, value)
-
-        model.validate()
-
+        domain_data = self._get_domain_data(domain)
         mailbox_data = self._get_mailbox_data(domain)
-        alias_data = self._get_alias_data(domain)
+        if mailbox_data.count >= domain_data.mailboxes:
+            raise KeyError("Max mailbox exceeded")
+        if mailbox_create.quota > domain_data.maxquota:
+            raise KeyError("Mailbox quota exceeded")
+        if mailbox_data.quota + mailbox_create.quota > domain_data.quota:
+            raise KeyError("Mailbox quota left exceeded")
 
-        if mailbox_data.biggest_mailbox > model.maxquota:
-            raise ValueError("max quota already used")
-        if mailbox_data.quota_all > model.quota:
-            raise ValueError("domain quota already used")
-        if mailbox_data.count > model.mailboxes:
-            raise ValueError("mailboxes already used")
-        if alias_data.count > model.aliases:
-            raise ValueError("aliases already used")
+        if mailbox_create.password != mailbox_create.password2:
+            raise ValueError("passwords don't match")
 
-        return model
+        hashed_password = bcrypt.hash(mailbox_create.password)
 
-    def delete_domain(self, domain):
-        count = self.session.query(func.count(MailboxModel.username)).filter_by(domain=domain).scalar()
-        if count:
-            raise ValueError("domain not empty")
+        mailbox = MailboxModel(
+            username=username,
+            password=hashed_password,
+            name=name,
+            local_part=local_part,
+            domain=domain,
+            quota=mailbox_create.quota,
+            active=mailbox_create.active,
+        )
+        quota2 = Quota2Model(
+            username=username,
+            bytes=0,
+            messages=0,
+        )
+        quota2replica = Quota2ReplicaModel(
+            username=username,
+            bytes=0,
+            messages=0,
+        )
+        alias = AliasModel(
+            address=username,
+            goto=username,
+            domain=domain,
+            active=mailbox_create.active,
+        )
+        user_acl = UserAclModel(
+            username=username,
+            spam_alias=mailbox_create.acl_spam_alias,
+            tls_policy=mailbox_create.acl_tls_policy,
+            spam_score=mailbox_create.acl_spam_score,
+            spam_policy=mailbox_create.acl_spam_policy,
+            delimiter_action=mailbox_create.acl_delimiter_action,
+            syncjobs=mailbox_create.acl_syncjobs,
+            eas_reset=mailbox_create.acl_eas_reset,
+            sogo_profile_reset=mailbox_create.acl_sogo_profile_reset,
+            pushover=mailbox_create.acl_pushover,
+            quarantine=mailbox_create.acl_quarantine,
+            quarantine_attachments=mailbox_create.acl_quarantine_attachments,
+            quarantine_notification=mailbox_create.acl_quarantine_notification,
+            quarantine_category=mailbox_create.acl_quarantine_category,
+        )
+        user_attributes = UserAttributesModel(
+            username=username,
+            force_pw_update=mailbox_create.force_pw_update,
+            tls_enforce_in=mailbox_create.tls_enforce_in,
+            tls_enforce_out=mailbox_create.tls_enforce_out,
+            sogo_access=mailbox_create.sogo_access,
+            imap_access=mailbox_create.imap_access,
+            pop3_access=mailbox_create.pop3_access,
+            smtp_access=mailbox_create.smtp_access,
+            sieve_access=mailbox_create.sieve_access,
+            relayhost=mailbox_create.relayhost,
+            quarantine_notification=mailbox_create.quarantine_notification,
+            quarantine_category=mailbox_create.quarantine_category,
+        )
+        self.db_session.add_all([
+            mailbox,
+            quota2,
+            quota2replica,
+            alias,
+            user_acl,
+            user_attributes,
+        ])
 
-        # TODO: cleanup dovecot
-        # TODO: cleanup redis
-        self.session.query(DomainModel).filter_by(domain=domain).delete()
-        self.session.query(AliasModel).filter_by(domain=domain).delete()
-        self.session.query(AliasDomainModel).filter_by(target_domain=domain).delete()
-        self.session.query(MailboxModel).filter_by(domain=domain).delete()
-        self.session.query(SenderAclModel).filter(SenderAclModel.logged_in_as.like(domain)).delete()
-        self.session.query(Quota2Model).filter(Quota2Model.username.like(domain)).delete()
-        self.session.query(Quota2ReplicaModel).filter(Quota2ReplicaModel.username.like(domain)).delete()
-        self.session.query(SpamaliasModel).filter(SpamaliasModel.address.like(domain)).delete()
-        self.session.query(BccMapsModel).filter_by(local_dest=domain).delete()
+        # TODO: ratelimit
+
+        self.sogo.update_static_view(username)
+
+        return mailbox
+
+    def update_mailbox(self, username, mailbox_update: MailboxUpdate):
+        details = self.get_mailbox_details(username)
+
+        # Update mailbox values.
+        mailbox = self.db_session.query(MailboxModel).filter_by(username=username).one()
+        if mailbox_update.name is not None:
+            mailbox.name = mailbox_update.name
+
+        if mailbox_update.active is not None:
+            self.db_session.query(AliasModel).filter_by(username=username).update({"active": mailbox_update.active})
+            mailbox.active = mailbox_update.active
+
+        if mailbox_update.password:
+            if mailbox_update.password != mailbox_update.password2:
+                raise ValueError("passwords don't match")
+
+            mailbox.password = bcrypt.hash(mailbox_update.password)
+
+        if mailbox_update.quota is not None:
+            domain_data = self._get_domain_data(details.domain)
+            if mailbox_update.quota > domain_data.maxquota:
+                raise KeyError("Mailbox quota exceeded")
+
+            mailbox_data = self._get_mailbox_data(details.domain)
+            if mailbox_data.quota - details.quota + mailbox_update.quota > domain_data.quota:
+                raise KeyError("Mailbox quota left exceeded")
+
+            mailbox.quota = mailbox_update.quota
+
+        # Update mailbox attributes.
+        attributes = self.db_session.query(UserAttributesModel).filter_by(username=username).one()
+        for key, value in mailbox_update.model_dump().items():
+            if value is not None and hasattr(attributes, key):
+                setattr(attributes, key, value)
+
+        # TODO: recovery email?
+
+        self.sogo.update_static_view(username)
+
+        return mailbox
+
+    def delete_mailbox(self, username):
+        self.db_session.query(AliasModel).filter_by(goto=username).delete()
+        # self.db_session.query(PushoverModel).filter_by(username=username).delete()
+        # self.db_session.query(QuarantineModel).filter_by(rcpt=username).delete()
+        self.db_session.query(Quota2Model).filter_by(username=username).delete()
+        self.db_session.query(Quota2ReplicaModel).filter_by(username=username).delete()
+        self.db_session.query(MailboxModel).filter_by(username=username).delete()
+        self.db_session.query(SenderAclModel).filter_by(
+            or_(
+                SenderAclModel.logged_in_as == username,
+                SenderAclModel.send_as == username,
+            )
+        ).delete()
+        self.db_session.query(UserAclModel).filter_by(username=username).delete()
+        self.db_session.query(SpamaliasModel).filter_by(goto=username).delete()
+        self.db_session.query(ImapsyncModel).filter_by(user2=username).delete()
+        self.db_session.query(FilterconfModel).filter_by(object=username).delete()
+        self.db_session.query(BccMapsModel).filter_by(local_dest=username).delete()
+        self.sogo.delete_user(username)
+        self.sogo.update_static_view(username)
+
+        # TODO: auth
+        # TODO: update aliases
+        # TODO: redis
 
     def _get_mailbox_data(self, domain):
         return (
-            self.session.query(
+            self.db_session.query(
                 func.count(MailboxModel.username).label("count"),
-                func.coalesce(func.round(MailboxModel.quota / mebi), 0).label("biggest_mailbox"),
-                func.coalesce(func.round(func.sum(MailboxModel.quota) / mebi), 0).label("quota_all"),
+                func.coalesce(func.round(func.sum(MailboxModel.quota) / mebi), 0).label("quota"),
             )
             .filter_by(kind="")
             .filter_by(domain=domain)
             .one()
         )
 
-    def _get_mailbox_data_domain(self, domain):
-        return (
-            self.session.query(
-                func.count(MailboxModel.username).label("count"),
-                func.coalesce(func.sum(MailboxModel.quota), 0).label("in_use"),
-            )
-            .filter_by(kind="")
-            .filter_by(domain=domain)
-            .one()
-        )
-
-    def _get_alias_data(self, domain):
-        return (
-            self.session.query(
-                func.count(AliasModel.id).label("count"),
-            )
-            .filter_by(domain=domain)
-            .filter(select(MailboxModel.username).scalar_subquery())
-            .one()
-        )
-
-    def _get_alias_data_domain(self, domain):
-        return (
-            self.session.query(func.count(AliasModel.address).label("alias_count"))
-            .filter(
-                or_(
-                    AliasModel.domain == domain,
-                    AliasModel.domain.in_(
-                        self.session.query(AliasDomainModel.alias_domain).filter_by(target_domain=domain)
-                    ),
-                )
-            )
-            .filter(AliasModel.address.not_in(self.session.query(MailboxModel.username)))
-            .one()
-        )
-
-    def _get_sum_quota_in_use(self, domain):
-        return (
-            self.session.query(
-                func.sum(Quota2Model.bytes).label("bytes_total"),
-                func.sum(Quota2Model.messages).label("msgs_total"),
-            )
-            .filter(Quota2Model.username.in_(select(MailboxModel.username).filter_by(domain=domain)))
-            .one()
-        )
+    def _get_domain_data(self, domain):
+        return self.db_session.query(DomainModel).filter_by(domain=domain).one()

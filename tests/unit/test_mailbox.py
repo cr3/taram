@@ -2,68 +2,86 @@
 
 import pytest
 
-from taram.mailbox import Mailbox
 from taram.models import (
-    AliasDomainModel,
-    DomainModel,
+    MailboxModel,
+    UserAttributesModel,
 )
 from taram.schemas import (
     DomainCreate,
-    DomainUpdate,
+    MailboxCreate,
+    MailboxUpdate,
 )
 
 
-def test_mailbox_get_origin_domain_without_alias(db_session):
-    """Getting an origin domain without an alias should return the domain."""
-    result = Mailbox(db_session).get_origin_domain("a.com")
-    assert result == "a.com"
-
-
-def test_mailbox_get_origin_domain_with_alias(db_session):
-    """Getting an origin domain with an alias should return the alias."""
-    alias_domain = AliasDomainModel(alias_domain="a.com", target_domain="b.com")
-    db_session.add(alias_domain)
+@pytest.fixture
+def domain(db_session, domain_manager, unique):
+    """Return the domain name for a managed domain."""
+    domain = unique("domain")
+    domain_create = DomainCreate(domain=domain)
+    domain_manager.create_domain(domain_create)
     db_session.flush()
-    result = Mailbox(db_session).get_origin_domain("a.com")
-    assert result == "b.com"
+
+    return domain
 
 
-def test_mailbox_get_domain_details(db_session):
-    """Getting domain details should at least include the domain name."""
-    domain = DomainModel(domain="a.com")
-    db_session.add(domain)
-    db_session.flush()
-    result = Mailbox(db_session).get_domain_details("a.com")
-    assert result.domain == "a.com"
-
-
-def test_mailbox_create_domain(db_session):
-    """Getting domain templates should return at least one template."""
-    domain_create = DomainCreate(
-        domain="a.com",
+def test_mailbox_manager_get_mailbox_details(db_session, domain, mailbox_manager):
+    """Getting mailbox details should at least include the local part."""
+    mailbox_create = MailboxCreate(
+        local_part="a",
+        domain=domain,
+        password="x",  # noqa: S106
+        password2="x",
     )
-    mailbox = Mailbox(db_session)
-    mailbox.create_domain(domain_create)
+    mailbox = mailbox_manager.create_mailbox(mailbox_create)
     db_session.flush()
-    result = mailbox.get_domain_details("a.com")
-    assert result.domain == "a.com"
+
+    result = mailbox_manager.get_mailbox_details(mailbox.username)
+    assert result.local_part == "a"
 
 
-def test_mailbox_update_domain(db_session):
-    """Updating a domain should return the updated details."""
-    domain = DomainModel(domain="a.com", active=True)
-    db_session.add(domain)
+def test_mailbox_manager_create_mailbox(db_session, domain, mailbox_manager):
+    """Creating a mailbox should create a mailbox row."""
+    mailbox_create = MailboxCreate(
+        local_part="a",
+        domain=domain,
+        password="x",  # noqa: S106
+        password2="x",
+    )
+    mailbox_manager.create_mailbox(mailbox_create)
     db_session.flush()
-    domain_update = DomainUpdate(active=False)
-    result = Mailbox(db_session).update_domain("a.com", domain_update)
-    assert result.active is False
+
+    result = db_session.query(MailboxModel).filter_by(domain=domain).one()
+    assert result.domain == domain
 
 
-def test_mailbox_delete_domain(db_session):
-    """Deleting a domain should delete it from everywhere."""
-    domain = DomainModel(domain="a.com", active=True)
-    db_session.add(domain)
-    mailbox = Mailbox(db_session)
-    mailbox.delete_domain("a.com")
-    with pytest.raises(KeyError):
-        mailbox.get_domain_details("a.com")
+def test_mailbox_manager_update_mailbox(db_session, domain, mailbox_manager):
+    """Updating a mailbox should return the updated details."""
+    mailbox_create = MailboxCreate(
+        local_part="a",
+        domain=domain,
+        password="x",  # noqa: S106
+        password2="x",
+    )
+    mailbox = mailbox_manager.create_mailbox(mailbox_create)
+    db_session.flush()
+
+    mailbox_update = MailboxUpdate(name="b")
+    result = mailbox_manager.update_mailbox(mailbox.username, mailbox_update)
+    assert result.name == "b"
+
+
+def test_mailbox_manager_update_mailbox_attributes(db_session, domain, mailbox_manager):
+    """Updating mailbox attributes should update the user attributes."""
+    mailbox_create = MailboxCreate(
+        local_part="a",
+        domain=domain,
+        password="x",  # noqa: S106
+        password2="x",
+    )
+    mailbox = mailbox_manager.create_mailbox(mailbox_create)
+    db_session.flush()
+
+    mailbox_update = MailboxUpdate(sogo_access=False)
+    mailbox_manager.update_mailbox(mailbox.username, mailbox_update)
+    result = db_session.query(UserAttributesModel).filter_by(username=mailbox.username).one()
+    assert result.sogo_access is False

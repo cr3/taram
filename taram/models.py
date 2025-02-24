@@ -2,9 +2,10 @@
 
 import re
 from datetime import datetime as dt
-from typing import Optional
+from typing import Any, Optional
 
 from sqlalchemy import (
+    JSON,
     TIMESTAMP,
     BigInteger,
     DateTime,
@@ -163,6 +164,55 @@ class DomainModel(TimestampMixin, SQLModel):
         return self
 
 
+class FilterconfModel(TimestampMixin, SQLModel):
+
+    prefix: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    object: Mapped[str] = mapped_column(String(255), server_default="")  # noqa: A003
+    option: Mapped[str] = mapped_column(String(50), server_default="")
+    value: Mapped[str] = mapped_column(String(100), server_default="")
+
+    __tablename__ = "filterconf"
+    __table_args__ = (Index("filterconf_object_key", object),)
+
+
+class ImapsyncModel(TimestampMixin, SQLModel):
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)  # noqa: A003
+    user2: Mapped[str] = mapped_column(String(255))
+    host1: Mapped[str] = mapped_column(String(255))
+    authmech1: Mapped[str] = mapped_column(Enum("PLAIN", "LOGIN", "CRAM-MD5"), server_default="PLAIN")
+    regextrans2: Mapped[str] = mapped_column(String(255), server_default="")
+    authmd51: Mapped[bool] = mapped_column(server_default="0")
+    domain2: Mapped[str] = mapped_column(String(255), server_default="")
+    subfolder2: Mapped[str] = mapped_column(String(255), server_default="")
+    user1: Mapped[str] = mapped_column(String(255))
+    password1: Mapped[str] = mapped_column(String(255))
+    exclude: Mapped[str] = mapped_column(String(500), server_default="")
+    maxage: Mapped[int] = mapped_column(server_default="0")
+    mins_interval: Mapped[int] = mapped_column(server_default="0")
+    maxbytespersecond: Mapped[str] = mapped_column(String(5), server_default="0")
+    port1: Mapped[int] = mapped_column()
+    enc1: Mapped[str] = mapped_column(Enum("TLS", "SSL", "PLAIN"), server_default="TLS")
+    delete2duplicates: Mapped[bool] = mapped_column(server_default="1")
+    delete1: Mapped[bool] = mapped_column(server_default="0")
+    delete2: Mapped[bool] = mapped_column(server_default="0")
+    automap: Mapped[bool] = mapped_column(server_default="0")
+    skipcrossduplicates: Mapped[bool] = mapped_column(server_default="0")
+    custom_params: Mapped[str] = mapped_column(String(512), server_default="")
+    timeout1: Mapped[int] = mapped_column(server_default="600")
+    timeout2: Mapped[int] = mapped_column(server_default="600")
+    subscribeall: Mapped[bool] = mapped_column(server_default="1")
+    dry: Mapped[bool] = mapped_column(server_default="0")
+    is_running: Mapped[bool] = mapped_column(server_default="0")
+    returned_text: Mapped[Optional[str]] = mapped_column(Text)
+    last_run: Mapped[Optional[int]] = mapped_column(TIMESTAMP)
+    success: Mapped[Optional[bool]] = mapped_column()
+    exit_status: Mapped[Optional[str]] = mapped_column(String(50))
+    active: Mapped[bool] = mapped_column(server_default="0")
+
+    __tablename__ = "imapsync"
+
+
 class MailboxModel(TimestampMixin, SQLModel):
 
     username: Mapped[str] = mapped_column(String(255), primary_key=True)
@@ -183,6 +233,30 @@ class MailboxModel(TimestampMixin, SQLModel):
         Index("mailbox_domain_local_part_key", domain, local_part, unique=True),
         Index("mailbox_kind_key", kind),
     )
+
+
+class QuarantineModel(SQLModel):
+
+    id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
+    qid: Mapped[str] = mapped_column(String(30))
+    subject: Mapped[Optional[str]] = mapped_column(String(500))
+    score: Mapped[Optional[float]] = mapped_column()
+    ip: Mapped[Optional[str]] = mapped_column(String(50))
+    action: Mapped[str] = mapped_column(String(20), server_default="unknown")
+    symbols: Mapped[dict[str, Any]] = mapped_column(JSON)
+    fuzzy_hashes: Mapped[dict[str, Any]] = mapped_column(JSON)
+    sender: Mapped[str] = mapped_column(String(255), server_default="unknown")
+    rcpt: Mapped[Optional[str]] = mapped_column(String(255))
+    msg: Mapped[Optional[str]] = mapped_column(Text)
+    domain: Mapped[Optional[str]] = mapped_column(String(255))
+    notified: Mapped[bool] = mapped_column(server_default="0")
+    created: Mapped[dt] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.current_timestamp(),
+    )
+    user: Mapped[str] = mapped_column(String(255), server_default="unknown")
+
+    __tablename__ = "quarantine"
 
 
 class Quota2Model(SQLModel):
@@ -255,6 +329,16 @@ class SenderAclModel(SQLModel):
     external: Mapped[bool] = mapped_column(server_default="0")
 
     __tablename__ = "sender_acl"
+
+
+class SettingsmapModel(TimestampMixin, SQLModel):
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)  # noqa: A003
+    desc: Mapped[str] = mapped_column(String(255))
+    content: Mapped[str] = mapped_column(Text)
+    active: Mapped[bool] = mapped_column(server_default="0")
+
+    __tablename__ = "settingsmap"
 
 
 class SogoStaticView(SQLModel):

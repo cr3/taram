@@ -1,10 +1,7 @@
 """Unit tests for the domain module."""
 
-from unittest.mock import Mock
-
 import pytest
 
-from taram.domain import DomainManager
 from taram.models import (
     AliasDomainModel,
     DomainModel,
@@ -13,12 +10,6 @@ from taram.schemas import (
     DomainCreate,
     DomainUpdate,
 )
-
-
-@pytest.fixture
-def domain_manager(db_session):
-    """Domain manager fixture."""
-    return DomainManager(db_session, Mock())
 
 
 def test_domain_manager_get_origin_domain_without_alias(domain_manager, db_session, unique):
@@ -36,7 +27,7 @@ def test_domain_manager_get_origin_domain_with_alias(domain_manager, db_model, d
     assert result == target_domain
 
 
-def test_domain_manager_get_domain_details(domain_manager, db_model, db_session, unique):
+def test_domain_manager_get_domain_details(db_model, db_session, domain_manager, unique):
     """Getting domain details should at least include the domain name."""
     domain = unique("domain")
     db_model(DomainModel, domain=domain)
@@ -44,7 +35,7 @@ def test_domain_manager_get_domain_details(domain_manager, db_model, db_session,
     assert result.domain == domain
 
 
-def test_domain_manager_create_domain(domain_manager, db_session, unique):
+def test_domain_manager_create_domain(db_session, domain_manager, unique):
     """Getting domain templates should return at least one template."""
     domain = unique("domain")
     domain_create = DomainCreate(domain=domain)
@@ -56,7 +47,7 @@ def test_domain_manager_create_domain(domain_manager, db_session, unique):
     assert result.domain == domain
 
 
-def test_domain_manager_update_domain(domain_manager, db_model, db_session, unique):
+def test_domain_manager_update_domain(db_model, db_session, domain_manager, unique):
     """Updating a domain should return the updated details."""
     domain = unique("domain")
     db_model(DomainModel, domain=domain)
@@ -65,7 +56,7 @@ def test_domain_manager_update_domain(domain_manager, db_model, db_session, uniq
     assert result.active is False
 
 
-def test_domain_manager_delete_domain(domain_manager, db_model, db_session, unique):
+def test_domain_manager_delete_domain(db_model, db_session, domain_manager, unique):
     """Deleting a domain should delete it from everywhere."""
     domain = unique("domain")
     db_model(DomainModel, domain=domain)

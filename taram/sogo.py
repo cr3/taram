@@ -8,7 +8,14 @@ from sqlalchemy.sql import case, func
 from taram.memcached import Memcached
 from taram.models import (
     MailboxModel,
+    SogoAclModel,
+    SogoCacheFolderModel,
+    SogoFolderInfoModel,
+    SogoQuickAppointmentModel,
+    SogoQuickContactModel,
     SogoStaticView,
+    SogoStoreModel,
+    SogoUserProfileModel,
     UserAttributesModel,
 )
 from taram.views import (
@@ -98,3 +105,22 @@ class Sogo:
         ).delete()
 
         self.memcached.flush()
+
+    def delete_user(self, username):
+        self.db_session.query(SogoUserProfileModel).filter_by(c_uid=username).delete()
+        self.db_session.query(SogoCacheFolderModel).filter_by(c_uid=username).delete()
+        # TODO: Also delete by c_object
+        self.db_session.query(SogoAclModel).filter_by(c_uid=username).delete()
+        folder_ids = self.db_session.query(SogoFolderInfoModel.c_folder_id).filter(
+            SogoFolderInfoModel.c_path2 == username
+        )
+        self.db_session.query(SogoStoreModel).filter(
+            SogoStoreModel.c_folder_id.in_(folder_ids.subquery()),
+        ).delete()
+        self.db_session.query(SogoQuickContactModel).filter(
+            SogoQuickContactModel.c_folder_id.in_(folder_ids.subquery()),
+        ).delete()
+        self.db_session.query(SogoQuickAppointmentModel).filter(
+            SogoQuickAppointmentModel.c_folder_id.in_(folder_ids.subquery()),
+        ).delete()
+        folder_ids.delete()

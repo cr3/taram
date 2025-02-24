@@ -74,6 +74,8 @@ services:
       target: backend
     restart: always
     depends_on:
+      dockerapi:
+        condition: service_started
       mysql:
         condition: service_started
     dns:
