@@ -67,6 +67,7 @@ sphinx-rtd-theme = "^1.2.0"
 taram = "taram.testing.fixtures"
 taram-db = "taram.testing.db"
 taram-managers = "taram.testing.managers"
+taram-services = "taram.testing.services"
 
 [tool.poetry.plugins."pytest_unique"]
 db-model = "taram.testing.unique:unique_db_model"

@@ -1,4 +1,4 @@
-"""Taram manager fixtures."""
+"""Manager fixtures."""
 
 from unittest.mock import Mock
 

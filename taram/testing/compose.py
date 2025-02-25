@@ -11,8 +11,8 @@ from pytest_xdocker.xdocker import xdocker
 
 
 @define(frozen=True)
-class ComposeClient:
-    """Compose client.
+class ComposeService:
+    """Compose service.
 
     :param name: Name of the compose service container.
     """
@@ -79,7 +79,7 @@ class ComposeServer(ProcessServer):
 
     @contextmanager
     def run(self, name):
-        """Return an `ComposeClient` to the running service."""
+        """Return an `ComposeService` to the running service."""
         with super().run(name):
             full_name = self.full_name(name)
-            yield ComposeClient(full_name)
+            yield ComposeService(full_name)

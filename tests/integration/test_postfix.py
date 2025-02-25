@@ -12,7 +12,7 @@ def get_postfix_banner(server, port=589):
         return banner.strip()
 
 
-def test_postfix(postfix_client):
+def test_postfix_service(postfix_service):
     """The Postfix service should return a banner."""
-    banner = get_postfix_banner(postfix_client.ip)
+    banner = get_postfix_banner(postfix_service.ip)
     assert "ESMTP Postfix" in banner

@@ -13,7 +13,7 @@ def resolve(name, ip, port=53):
     return resolver.resolve_name(name, lifetime=60)
 
 
-def test_unbound_resolve(unbound_client):
-    """The unbound client should resolve domain names."""
-    answer = retry(resolve, "github.com", unbound_client.ip).catching(LifetimeTimeout)
+def test_unbound_resolve(unbound_service):
+    """The unbound service should resolve domain names."""
+    answer = retry(resolve, "github.com", unbound_service.ip).catching(LifetimeTimeout)
     assert answer.canonical_name().to_text() == "github.com."

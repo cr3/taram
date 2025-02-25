@@ -11,7 +11,7 @@ from hamcrest import (
 from requests import HTTPError
 
 
-def test_dockerapi_get_services(dockerapi_session, dockerapi_client):
+def test_dockerapi_get_services(dockerapi_session):
     """Getting services should include the dockerapi fixture."""
     result = dockerapi_session.get("/services")
     assert_that(
@@ -25,7 +25,7 @@ def test_dockerapi_get_services(dockerapi_session, dockerapi_client):
     )
 
 
-def test_dockerapi_get_service(dockerapi_session, dockerapi_client):
+def test_dockerapi_get_service(dockerapi_session):
     """Getting a service should include containers."""
     result = dockerapi_session.get("/services/dockerapi")
     assert_that(
@@ -37,7 +37,7 @@ def test_dockerapi_get_service(dockerapi_session, dockerapi_client):
     )
 
 
-def test_dockerapi_post_service_action(dockerapi_session, dockerapi_client):
+def test_dockerapi_post_service_action(dockerapi_session):
     """Posting a show action should return a success message."""
     result = dockerapi_session.post("/services/dockerapi/show")
     assert_that(
@@ -48,7 +48,7 @@ def test_dockerapi_post_service_action(dockerapi_session, dockerapi_client):
     )
 
 
-def test_dockerapi_post_invalid_service_action(dockerapi_session, dockerapi_client):
+def test_dockerapi_post_invalid_service_action(dockerapi_session):
     """Posting an invalid action should return a 400 status code."""
     with pytest.raises(HTTPError):
         dockerapi_session.post("/services/dockerapi/test")
