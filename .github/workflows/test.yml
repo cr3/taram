@@ -36,6 +36,11 @@ jobs:
       - name: Check out
         uses: actions/checkout@v3
 
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libmemcached-dev
+          version: 1.0
+
       - name: Set up the environment
         uses: ./.github/actions/setup-poetry-env
         with:
