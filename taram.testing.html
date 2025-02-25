@@ -110,48 +110,6 @@
 <span id="taram-testing-compose-module"></span><h2>taram.testing.compose module<a class="headerlink" href="#module-taram.testing.compose" title="Permalink to this heading"></a></h2>
 <p>Compose server module.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="taram.testing.compose.ComposeClient">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.testing.compose.</span></span><span class="sig-name descname"><span class="pre">ComposeClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.compose.ComposeClient" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Compose client.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> – Name of the compose service container.</p>
-</dd>
-</dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="taram.testing.compose.ComposeClient.container">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">container</span></span><a class="headerlink" href="#taram.testing.compose.ComposeClient.container" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="taram.testing.compose.ComposeClient.container_id">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">container_id</span></span><a class="headerlink" href="#taram.testing.compose.ComposeClient.container_id" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="taram.testing.compose.ComposeClient.env">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">env</span></span><a class="headerlink" href="#taram.testing.compose.ComposeClient.env" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="taram.testing.compose.ComposeClient.ip">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ip</span></span><a class="headerlink" href="#taram.testing.compose.ComposeClient.ip" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="taram.testing.compose.ComposeClient.name">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#taram.testing.compose.ComposeClient.name" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="taram.testing.compose.ComposeClient.started_at">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">started_at</span></span><a class="headerlink" href="#taram.testing.compose.ComposeClient.started_at" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="taram.testing.compose.ComposeServer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.testing.compose.</span></span><span class="sig-name descname"><span class="pre">ComposeServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/dev/null'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.compose.ComposeServer" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessServer</span></code></p>
@@ -169,110 +127,66 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="taram.testing.compose.ComposeServer.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.compose.ComposeServer.run" title="Permalink to this definition"></a></dt>
-<dd><p>Return an <cite>ComposeClient</cite> to the running service.</p>
+<dd><p>Return an <cite>ComposeService</cite> to the running service.</p>
 </dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="taram.testing.compose.ComposeService">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taram.testing.compose.</span></span><span class="sig-name descname"><span class="pre">ComposeService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.compose.ComposeService" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Compose service.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – Name of the compose service container.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="taram.testing.compose.ComposeService.container">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">container</span></span><a class="headerlink" href="#taram.testing.compose.ComposeService.container" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="taram.testing.compose.ComposeService.container_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">container_id</span></span><a class="headerlink" href="#taram.testing.compose.ComposeService.container_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="taram.testing.compose.ComposeService.env">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">env</span></span><a class="headerlink" href="#taram.testing.compose.ComposeService.env" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="taram.testing.compose.ComposeService.ip">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ip</span></span><a class="headerlink" href="#taram.testing.compose.ComposeService.ip" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="taram.testing.compose.ComposeService.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#taram.testing.compose.ComposeService.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="taram.testing.compose.ComposeService.started_at">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">started_at</span></span><a class="headerlink" href="#taram.testing.compose.ComposeService.started_at" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-taram.testing.fixtures">
 <span id="taram-testing-fixtures-module"></span><h2>taram.testing.fixtures module<a class="headerlink" href="#module-taram.testing.fixtures" title="Permalink to this heading"></a></h2>
-<p>Taram fixtures.</p>
+<p>Testing fixtures.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="taram.testing.fixtures.backend_app">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">backend_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.backend_app" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.backend_client">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">backend_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.backend_client" title="Permalink to this definition"></a></dt>
-<dd><p>Backend client fixture.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.clamd_client">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">clamd_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.clamd_client" title="Permalink to this definition"></a></dt>
-<dd><p>Clamd client fixture.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.dockerapi_app">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">dockerapi_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.dockerapi_app" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.dockerapi_client">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">dockerapi_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.dockerapi_client" title="Permalink to this definition"></a></dt>
-<dd><p>Dockerapi client fixture.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.dockerapi_session">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">dockerapi_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dockerapi_client</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.dockerapi_session" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.dovecot_client">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">dovecot_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.dovecot_client" title="Permalink to this definition"></a></dt>
-<dd><p>Dovecot client fixture.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.env_file">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">env_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.env_file" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">backend_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.backend_app" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="taram.testing.fixtures.logger_handler">
 <span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">logger_handler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.logger_handler" title="Permalink to this definition"></a></dt>
 <dd><p>Logger handler fixture.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.memcached_client">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">memcached_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.memcached_client" title="Permalink to this definition"></a></dt>
-<dd><p>Memcached client fixture.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.mysql_client">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">mysql_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.mysql_client" title="Permalink to this definition"></a></dt>
-<dd><p>MySQL client fixture.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.postfix_client">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">postfix_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.postfix_client" title="Permalink to this definition"></a></dt>
-<dd><p>Postfix client fixture.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.project">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">project</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.project" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.redis_client">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">redis_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.redis_client" title="Permalink to this definition"></a></dt>
-<dd><p>Redis client fixture.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.rspamd_client">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">rspamd_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">redis_client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.rspamd_client" title="Permalink to this definition"></a></dt>
-<dd><p>Rspamd client fixture.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.sogo_client">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">sogo_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">redis_client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.sogo_client" title="Permalink to this definition"></a></dt>
-<dd><p>SOGo client fixture.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="taram.testing.fixtures.unbound_client">
-<span class="sig-prename descclassname"><span class="pre">taram.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">unbound_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taram.testing.fixtures.unbound_client" title="Permalink to this definition"></a></dt>
-<dd><p>Unbound client fixture.</p>
 </dd></dl>
 
 </section>
