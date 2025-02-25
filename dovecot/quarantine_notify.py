@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import json
 import os
 import smtplib
 import sys
@@ -166,15 +165,16 @@ try:
         except Exception:
             print("Could not determine last notification for %s, assuming never" % (record["rcpt"]))
             last_notification = 0
-        attrs_json = query_mysql('SELECT attributes FROM mailbox WHERE username = "%s"' % (record["rcpt"]))  # noqa: 608
-        attrs = attrs_json[0]["attributes"]
-        attrs = json.loads(attrs) if isinstance(attrs, str) else json.loads(attrs.decode("utf-8"))
-        if attrs["quarantine_notification"] not in ("hourly", "daily", "weekly"):
+        quarantine_notifications = query_mysql(
+            'SELECT quarantine_notification FROM user_attributes WHERE username = "%s"' % (record["rcpt"])  # noqa: S608
+        )
+        quarantine_notification = quarantine_notifications[0]
+        if quarantine_notification not in ("hourly", "daily", "weekly"):
             continue
-        if last_notification == 0 or (last_notification + time_trans[attrs["quarantine_notification"]]) <= time_now:
+        if last_notification == 0 or (last_notification + time_trans[quarantine_notification]) <= time_now:
             print(
                 "Notifying %s: Considering %d new items in quarantine (policy: %s)"
-                % (record["rcpt"], record["counter"], attrs["quarantine_notification"])
+                % (record["rcpt"], record["counter"], quarantine_notification)
             )
             notify_rcpt(record["rcpt"], record["counter"], record["quarantine_acl"], attrs["quarantine_category"])
 

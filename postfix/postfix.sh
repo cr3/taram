@@ -52,9 +52,9 @@ query = SELECT IF(EXISTS(SELECT address, domain FROM alias
       WHERE address = '%s'
         AND domain IN (
           SELECT domain FROM domain
-            WHERE backupmx = '1'
-              AND relay_all_recipients = '1'
-              AND relay_unknown_only = '1')
+            WHERE backupmx = 1
+              AND relay_all_recipients = 1
+              AND relay_unknown_only = 1)
 
       ), 'lmtp:inet:dovecot:24', NULL) AS 'transport'
 EOF
@@ -68,12 +68,12 @@ dbname = ${DBNAME}
 query = SELECT DISTINCT
   CASE WHEN '%d' IN (
     SELECT domain FROM domain
-      WHERE relay_all_recipients=1
-        AND domain='%d'
-        AND backupmx=1
+      WHERE relay_all_recipients = 1
+        AND domain = '%d'
+        AND backupmx = 1
   )
   THEN '%s' ELSE (
-    SELECT goto FROM alias WHERE address='%s' AND active='1'
+    SELECT goto FROM alias WHERE address = '%s' AND active = 1
   )
   END AS result;
 EOF
@@ -84,7 +84,7 @@ user = ${DBUSER}
 password = ${DBPASS}
 hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
-query = SELECT CONCAT(policy, ' ', parameters) AS tls_policy FROM tls_policy_override WHERE active = '1' AND dest = '%s'
+query = SELECT CONCAT(policy, ' ', parameters) AS tls_policy FROM tls_policy_override WHERE active = 1 AND dest = '%s'
 EOF
 
 cat <<EOF > /opt/postfix/conf/sql/mysql_tls_enforce_in_policy.cf
@@ -95,13 +95,15 @@ hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
 query = SELECT IF(EXISTS(
   SELECT 'TLS_ACTIVE' FROM alias
+    LEFT OUTER JOIN user_attributes ON user_attributes.username = alias.goto
     LEFT OUTER JOIN mailbox ON mailbox.username = alias.goto
-      WHERE (address='%s'
+      WHERE (address = '%s'
         OR address IN (
           SELECT CONCAT('%u', '@', target_domain) FROM alias_domain
-            WHERE alias_domain='%d'
+            WHERE alias_domain = '%d'
         )
-      ) AND JSON_UNQUOTE(JSON_VALUE(attributes, '$.tls_enforce_in')) = '1' AND mailbox.active = '1'
+      ) AND user_attributes.tls_enforce_in = 1
+      AND mailbox.active = 1
   ), 'reject_plaintext_session', NULL) AS 'tls_enforce_in';
 EOF
 
@@ -114,6 +116,7 @@ dbname = ${DBNAME}
 query = SELECT GROUP_CONCAT(transport SEPARATOR '') AS transport_maps
   FROM (
     SELECT IF(EXISTS(SELECT 'smtp_type' FROM alias
+      LEFT OUTER JOIN user_attributes ON user_attributes.username = alias.goto
       LEFT OUTER JOIN mailbox ON mailbox.username = alias.goto
         WHERE (address = '%s'
           OR address IN (
@@ -121,18 +124,18 @@ query = SELECT GROUP_CONCAT(transport SEPARATOR '') AS transport_maps
               WHERE alias_domain = '%d'
           )
         )
-        AND JSON_UNQUOTE(JSON_VALUE(attributes, '$.tls_enforce_out')) = '1'
-        AND mailbox.active = '1'
+        AND user_attributes.tls_enforce_out = 1
+        AND mailbox.active = 1
     ), 'smtp_enforced_tls:', 'smtp:') AS 'transport'
     UNION ALL
     SELECT COALESCE(
       (SELECT hostname FROM relayhosts
-      LEFT OUTER JOIN mailbox ON JSON_UNQUOTE(JSON_VALUE(mailbox.attributes, '$.relayhost')) = relayhosts.id
-        WHERE relayhosts.active = '1'
+      LEFT OUTER JOIN user_attributes ON user_attributes.relayhost = relayhosts.id
+        WHERE relayhosts.active = 1
           AND (
-            mailbox.username IN (SELECT alias.goto from alias
-              JOIN mailbox ON mailbox.username = alias.goto
-                WHERE alias.active = '1'
+            user_attributes.username IN (SELECT alias.goto from alias
+              JOIN user_attributes ON user_attributes.username = alias.goto
+                WHERE alias.active = 1
                   AND alias.address = '%s'
                   AND alias.address NOT LIKE '@%%'
             )
@@ -140,7 +143,7 @@ query = SELECT GROUP_CONCAT(transport SEPARATOR '') AS transport_maps
       ),
       (SELECT hostname FROM relayhosts
       LEFT OUTER JOIN domain ON domain.relayhost = relayhosts.id
-        WHERE relayhosts.active = '1'
+        WHERE relayhosts.active = 1
           AND (domain.domain = '%d'
             OR domain.domain IN (
               SELECT target_domain FROM alias_domain
@@ -159,7 +162,7 @@ password = ${DBPASS}
 hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
 query = SELECT CONCAT('smtp_via_transport_maps:', nexthop) AS transport FROM transports
-  WHERE active = '1'
+  WHERE active = 1
   AND destination = '%s';
 EOF
 
@@ -184,7 +187,7 @@ query = SELECT CONCAT_WS(':', username, password) AS auth_data FROM relayhosts
     SELECT COALESCE(
       (SELECT id FROM relayhosts
       LEFT OUTER JOIN domain ON domain.relayhost = relayhosts.id
-      WHERE relayhosts.active = '1'
+      WHERE relayhosts.active = 1
         AND (domain.domain = '%d'
           OR domain.domain IN (
             SELECT target_domain FROM alias_domain
@@ -193,13 +196,13 @@ query = SELECT CONCAT_WS(':', username, password) AS auth_data FROM relayhosts
         )
       ),
       (SELECT id FROM relayhosts
-      LEFT OUTER JOIN mailbox ON JSON_UNQUOTE(JSON_VALUE(mailbox.attributes, '$.relayhost')) = relayhosts.id
-      WHERE relayhosts.active = '1'
+      LEFT OUTER JOIN user_attributes ON user_attributes.relayhost = relayhosts.id
+      WHERE relayhosts.active = 1
         AND (
-          mailbox.username IN (
+          user_attributes.username IN (
             SELECT alias.goto from alias
-              JOIN mailbox ON mailbox.username = alias.goto
-                WHERE alias.active = '1'
+              JOIN user_attributes ON user_attributes.username = alias.goto
+                WHERE alias.active = 1
                   AND alias.address = '%s'
                   AND alias.address NOT LIKE '@%%'
           )
@@ -207,7 +210,7 @@ query = SELECT CONCAT_WS(':', username, password) AS auth_data FROM relayhosts
       )
     )
   )
-  AND active = '1'
+  AND active = 1
   AND username != '';
 EOF
 
@@ -219,7 +222,7 @@ hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
 query = SELECT CONCAT_WS(':', username, password) AS auth_data FROM transports
   WHERE nexthop = '%s'
-  AND active = '1'
+  AND active = 1
   AND username != ''
   LIMIT 1;
 EOF
@@ -233,8 +236,8 @@ dbname = ${DBNAME}
 query = SELECT username FROM mailbox, alias_domain
   WHERE alias_domain.alias_domain = '%d'
     AND mailbox.username = CONCAT('%u', '@', alias_domain.target_domain)
-    AND (mailbox.active = '1' OR mailbox.active = '2')
-    AND alias_domain.active='1'
+    AND mailbox.active = 1
+    AND alias_domain.active = 1
 EOF
 
 cat <<EOF > /opt/postfix/conf/sql/mysql_virtual_alias_maps.cf
@@ -244,8 +247,8 @@ password = ${DBPASS}
 hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
 query = SELECT goto FROM alias
-  WHERE address='%s'
-    AND (active='1' OR active='2');
+  WHERE address = '%s'
+    AND active = 1;
 EOF
 
 cat <<EOF > /opt/postfix/conf/sql/mysql_recipient_bcc_maps.cf
@@ -255,9 +258,9 @@ password = ${DBPASS}
 hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
 query = SELECT bcc_dest FROM bcc_maps
-  WHERE local_dest='%s'
-    AND type='rcpt'
-    AND active='1';
+  WHERE local_dest = '%s'
+    AND type = 'rcpt'
+    AND active = 1;
 EOF
 
 cat <<EOF > /opt/postfix/conf/sql/mysql_sender_bcc_maps.cf
@@ -267,9 +270,9 @@ password = ${DBPASS}
 hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
 query = SELECT bcc_dest FROM bcc_maps
-  WHERE local_dest='%s'
-    AND type='sender'
-    AND active='1';
+  WHERE local_dest = '%s'
+    AND type = 'sender'
+    AND active = 1;
 EOF
 
 cat <<EOF > /opt/postfix/conf/sql/mysql_recipient_canonical_maps.cf
@@ -279,8 +282,8 @@ password = ${DBPASS}
 hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
 query = SELECT new_dest FROM recipient_maps
-  WHERE old_dest='%s'
-    AND active='1';
+  WHERE old_dest = '%s'
+    AND active = 1;
 EOF
 
 cat <<EOF > /opt/postfix/conf/sql/mysql_virtual_domains_maps.cf
@@ -289,12 +292,12 @@ user = ${DBUSER}
 password = ${DBPASS}
 hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
-query = SELECT alias_domain from alias_domain WHERE alias_domain='%s' AND active='1'
+query = SELECT alias_domain from alias_domain WHERE alias_domain = '%s' AND active = 1
   UNION
   SELECT domain FROM domain
-    WHERE domain='%s'
-      AND active = '1'
-      AND backupmx = '0'
+    WHERE domain = '%s'
+      AND active = 1
+      AND backupmx = 0
 EOF
 
 cat <<EOF > /opt/postfix/conf/sql/mysql_virtual_mailbox_maps.cf
@@ -303,7 +306,7 @@ user = ${DBUSER}
 password = ${DBPASS}
 hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
-query = SELECT CONCAT(JSON_UNQUOTE(JSON_VALUE(attributes, '$.mailbox_format')), mailbox_path_prefix, '%d/%u/') FROM mailbox WHERE username='%s' AND (active = '1' OR active = '2')
+query = SELECT CONCAT('maildir:', mailbox_path_prefix, '%d/%u/') FROM mailbox WHERE username = '%s' AND active = 1
 EOF
 
 cat <<EOF > /opt/postfix/conf/sql/mysql_virtual_relay_domain_maps.cf
@@ -312,7 +315,7 @@ user = ${DBUSER}
 password = ${DBPASS}
 hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
-query = SELECT domain FROM domain WHERE domain='%s' AND backupmx = '1' AND active = '1'
+query = SELECT domain FROM domain WHERE domain = '%s' AND backupmx = 1 AND active = 1
 EOF
 
 cat <<EOF > /opt/postfix/conf/sql/mysql_virtual_sender_acl.cf
@@ -327,31 +330,31 @@ query = SELECT goto FROM alias
       SELECT COALESCE (
         (
           SELECT id FROM alias
-            WHERE address='%s'
-            AND (active='1' OR active='2')
+            WHERE address = '%s'
+            AND active = 1
         ), (
           SELECT id FROM alias
-            WHERE address='@%d'
-            AND (active='1' OR active='2')
+            WHERE address = '@%d'
+            AND active = 1
         )
       )
     )
-    AND active='1'
+    AND active = 1
     AND (domain IN
       (SELECT domain FROM domain
-        WHERE domain='%d'
-          AND active='1')
+        WHERE domain = '%d'
+          AND active = 1)
       OR domain in (
         SELECT alias_domain FROM alias_domain
-          WHERE alias_domain='%d'
-            AND active='1'
+          WHERE alias_domain = '%d'
+            AND active = 1
       )
     )
   UNION
   SELECT logged_in_as FROM sender_acl
-    WHERE send_as='@%d'
-      OR send_as='%s'
-      OR send_as='*'
+    WHERE send_as = '@%d'
+      OR send_as = '%s'
+      OR send_as = '*'
       OR send_as IN (
         SELECT CONCAT('@',target_domain) FROM alias_domain
           WHERE alias_domain = '%d')
@@ -360,13 +363,13 @@ query = SELECT goto FROM alias
           WHERE alias_domain = '%d')
       AND logged_in_as NOT IN (
         SELECT goto FROM alias
-          WHERE address='%s')
+          WHERE address = '%s')
   UNION
   SELECT username FROM mailbox, alias_domain
     WHERE alias_domain.alias_domain = '%d'
       AND mailbox.username = CONCAT('%u','@',alias_domain.target_domain)
-      AND (mailbox.active = '1' OR mailbox.active ='2')
-      AND alias_domain.active='1';
+      AND mailbox.active = 1
+      AND alias_domain.active = 1;
 EOF
 
 # MX based routing
@@ -378,8 +381,8 @@ hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
 query = SELECT CONCAT('FILTER smtp_via_transport_maps:', nexthop) as transport FROM transports
   WHERE '%s' REGEXP destination
-    AND active='1'
-    AND is_mx_based='1';
+    AND active = 1
+    AND is_mx_based = 1;
 EOF
 
 cat <<EOF > /opt/postfix/conf/sql/mysql_virtual_spamalias_maps.cf
@@ -389,7 +392,7 @@ password = ${DBPASS}
 hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = ${DBNAME}
 query = SELECT goto FROM spamalias
-  WHERE address='%s'
+  WHERE address = '%s'
     AND validity >= UNIX_TIMESTAMP()
 EOF
 
