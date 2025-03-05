@@ -62,6 +62,9 @@ class Dockerapi:
             ],
         })
         containers = await self.docker.containers.list(all=True, filters=filters)
+        if not containers:
+            raise KeyError(f"Service not found: {name}")
+
         return DockerapiService(name, containers)
 
 
