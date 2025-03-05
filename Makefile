@@ -47,6 +47,7 @@ docs: $(VENV)
 ssl-example:
 	@echo Generating snake-oil certificate: Running openssl
 	@mkdir -p $@
+	@openssl dhparam -out $@/dhparams.pem 2048
 	@openssl req -x509 -newkey rsa:4096 -keyout $@/key.pem -out $@/cert.pem -days 365 -subj "/C=CA/ST=QC/L=Notre-Dame-du-Laus/O=mail/OU=mail/CN=${MAIL_HOSTNAME}" -sha256 -nodes
 
 ssl: ssl-example
