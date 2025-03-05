@@ -15,9 +15,7 @@ services:
 
   memcached:
     image: memcached:alpine
-    command:
-      - memcached
-      - "-vv"
+    command: memcached -vv
     restart: always
     networks:
       mail-network:
@@ -49,9 +47,7 @@ services:
   redis:
     image: redis:7-alpine
     entrypoint: /entrypoint.sh
-    command:
-      - redis-server
-      - /redis.conf
+    command: redis-server /redis.conf
     volumes:
       - ./redis/entrypoint.sh:/entrypoint.sh:z
       - redis-vol-1:/data/
@@ -69,9 +65,9 @@ services:
   backend:
     build:
       context: .
-      args:
-        PYTHON_EXTRAS: backend
-      target: backend
+    command: >
+      bash -c "alembic upgrade head
+      && uvicorn --host=0.0.0.0 --port=80 taram.backend:app"
     restart: always
     depends_on:
       dockerapi:
@@ -193,7 +189,7 @@ services:
       - DBUSER=${DBUSER}
       - DBPASS=${DBPASS}
       - MAIL_HOSTNAME=${MAIL_HOSTNAME}
-      - MAIL_PASS_SCHEME=${MAIL_PASS_SCHEME:-BLF-CRYPT}
+#      - MAIL_PASS_SCHEME=${MAIL_PASS_SCHEME:-BLF-CRYPT}
       - IPV4_NETWORK=${IPV4_NETWORK:-172.22.1}
       - ALLOW_ADMIN_EMAIL_LOGIN=${ALLOW_ADMIN_EMAIL_LOGIN:-n}
       - MAILDIR_GC_TIME=${MAILDIR_GC_TIME:-7200}
@@ -289,9 +285,7 @@ services:
   netfilter:
     build:
       context: .
-      args:
-        PYTHON_EXTRAS: netfilter
-      target: netfilter
+    command: netfilter
     stop_grace_period: 30s
     restart: always
     privileged: true
@@ -312,9 +306,7 @@ services:
   dockerapi:
     build:
       context: .
-      args:
-        PYTHON_EXTRAS: dockerapi
-      target: dockerapi
+    command: uvicorn --host=0.0.0.0 --port=80 taram.dockerapi:app
     security_opt:
       - label=disable
     restart: always

@@ -13,7 +13,7 @@ $(VENV):
 	@echo Building Python virtualenv
 	@$(PYTHON) -m venv $@
 	@echo Installing Poetry environment
-	@poetry install --all-extras
+	@poetry install
 	@$(TOUCH) $@
 
 # Convenience target to build venv
