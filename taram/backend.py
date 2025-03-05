@@ -11,6 +11,7 @@ from fastapi import (
     Response,
 )
 from fastapi.routing import APIRoute
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from taram.db import get_session
@@ -25,7 +26,7 @@ logger = logging.getLogger("uvicorn")
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
-app = FastAPI()
+app = FastAPI(docs_url="/swagger")
 
 
 @app.get("/domains")
@@ -74,6 +75,8 @@ def get_sogo_auth(response: Response) -> None:
 async def key_error_handler(request: Request, exc: KeyError):
     raise HTTPException(404, "Domain not found") from exc
 
+
+app.mount("/docs", StaticFiles(directory="./build/html", html=True, check_dir=False))
 
 # Simplify operation IDs to use route names.
 for route in app.routes:
