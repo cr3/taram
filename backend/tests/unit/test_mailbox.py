@@ -29,7 +29,7 @@ def test_mailbox_manager_get_mailbox_details(db_session, domain, mailbox_manager
     mailbox_create = MailboxCreate(
         local_part="a",
         domain=domain,
-        password="x",  # noqa: S106
+        password="x",
         password2="x",
     )
     mailbox = mailbox_manager.create_mailbox(mailbox_create)
@@ -44,7 +44,7 @@ def test_mailbox_manager_create_mailbox(db_session, domain, mailbox_manager):
     mailbox_create = MailboxCreate(
         local_part="a",
         domain=domain,
-        password="x",  # noqa: S106
+        password="x",
         password2="x",
     )
     mailbox_manager.create_mailbox(mailbox_create)
@@ -59,7 +59,7 @@ def test_mailbox_manager_update_mailbox(db_session, domain, mailbox_manager):
     mailbox_create = MailboxCreate(
         local_part="a",
         domain=domain,
-        password="x",  # noqa: S106
+        password="x",
         password2="x",
     )
     mailbox = mailbox_manager.create_mailbox(mailbox_create)
@@ -75,7 +75,7 @@ def test_mailbox_manager_update_mailbox_attributes(db_session, domain, mailbox_m
     mailbox_create = MailboxCreate(
         local_part="a",
         domain=domain,
-        password="x",  # noqa: S106
+        password="x",
         password2="x",
     )
     mailbox = mailbox_manager.create_mailbox(mailbox_create)

@@ -24,9 +24,9 @@ from taram.sogo import Sogo
 )
 def test_sogo_update_static_view_password(force_pw_update, sogo_access, expected, db_model, db_session):
     """The password should only be the same when force_pw_update is False and sogo_access is True."""
-    mailbox = db_model(MailboxModel, password="original")  # noqa: S106
+    mailbox = db_model(MailboxModel, password="original")
     db_model(UserAttributesModel, username=mailbox.username, force_pw_update=force_pw_update, sogo_access=sogo_access)
-    Sogo(db_session, Mock(), default_password="default").update_static_view(mailbox.username)  # noqa: S106
+    Sogo(db_session, Mock(), default_password="default").update_static_view(mailbox.username)
     result = db_session.query(SogoStaticView).one()
     assert result.c_password == expected
 

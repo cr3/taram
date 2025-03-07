@@ -19,8 +19,8 @@ import dns.resolver
 from attrs import define, field
 from more_itertools import partition
 from nftables import Nftables
-
 from redis import StrictRedis
+
 from taram.logger import (
     LoggerHandlerAction,
     LoggerLevelAction,
