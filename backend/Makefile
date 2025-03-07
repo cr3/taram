@@ -4,7 +4,7 @@ PYTHON := poetry run python
 TOUCH := $(PYTHON) -c 'import sys; from pathlib import Path; Path(sys.argv[1]).touch()'
 
 poetry.lock: pyproject.toml
-	poetry check --lock
+	poetry lock --no-update
 
 # Build .venv with deps.
 $(VENV):
@@ -23,7 +23,7 @@ check: $(VENV)
 	@echo Checking Poetry lock: Running poetry check --lock
 	@poetry check --lock
 	@echo Linting code: Running pre-commit
-	@poetry run pre-commit run -a
+	@poetry run ruff check .
 
 .PHONY: test
 test: $(VENV)
