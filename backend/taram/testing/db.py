@@ -107,7 +107,7 @@ class DbModel:
             foreign_object = self(foreign_model)
 
             # Kwargs must reference the new foreign object
-            for local_key, remote_key in zip(fkey_constraint.column_keys, fkey_constraint.elements):
+            for local_key, remote_key in zip(fkey_constraint.column_keys, fkey_constraint.elements, strict=True):
                 new_kwargs[local_key] = getattr(foreign_object, remote_key.column.name)
 
         return new_kwargs

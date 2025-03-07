@@ -1,6 +1,5 @@
 """Testing models."""
 
-from typing import Optional
 
 from sqlalchemy import (
     Text,
@@ -30,7 +29,7 @@ class NullableTest(SQLModel):
     __tablename__ = "nullable_test"
 
     test_id: Mapped[int] = mapped_column(primary_key=True)
-    value: Mapped[Optional[str]] = mapped_column(Text)
+    value: Mapped[str | None] = mapped_column(Text)
 
 
 class DefaultTest(SQLModel):
@@ -66,7 +65,7 @@ class NullableForeignKeyTest(SQLModel):
     __tablename__ = "nullable_foreign_key_test"
 
     key: Mapped[int] = mapped_column(primary_key=True)
-    test_id: Mapped[Optional[int]] = mapped_column(ForeignKey("default_test.test_id"))
+    test_id: Mapped[int | None] = mapped_column(ForeignKey("default_test.test_id"))
     value = relationship("DefaultTest", foreign_keys=[test_id])
 
 
@@ -102,4 +101,4 @@ class TextTest(SQLModel):
     __tablename__ = "text_test"
 
     test_id: Mapped[int] = mapped_column(primary_key=True)
-    value: Mapped[Optional[str]] = mapped_column(Text)
+    value: Mapped[str | None] = mapped_column(Text)

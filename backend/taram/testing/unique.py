@@ -1,6 +1,6 @@
 """Unique fixtures for data generation."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import partial
 from secrets import choice
 
@@ -28,7 +28,7 @@ def unique_db_value(unique, column_type):
     """Make a unique database value given a type."""
     for value_type, value_factory in [
         (Boolean, lambda: True),
-        (DateTime, datetime.now(timezone.utc)),
+        (DateTime, datetime.now(UTC)),
         (Enum, lambda: choice(list(column_type.enum_class))),
         (Integer, partial(unique, "integer")),
         (LargeBinary, partial(unique, "bytes")),
