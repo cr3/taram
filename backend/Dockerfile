@@ -27,10 +27,10 @@ RUN apt update \
 WORKDIR /app
 
 COPY poetry.lock pyproject.toml ./
-RUN poetry install --without=test --with=docs --no-root
+RUN poetry install --with=docs --no-root
 
 COPY . ./
-RUN poetry install --without=test --with=docs
+RUN poetry install --with=docs
 RUN poetry run sphinx-build -W -d build/doctrees docs build/html
 
 FROM base AS runtime

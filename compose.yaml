@@ -63,17 +63,14 @@ services:
         ipv4_address: ${IPV4_NETWORK:-172.22.1}.249
 
   backend:
-    build:
-      context: .
+    build: backend
     command: >
       bash -c "alembic upgrade head
       && uvicorn --host=0.0.0.0 --port=80 taram.backend:app"
     restart: always
     depends_on:
-      dockerapi:
-        condition: service_started
-      mysql:
-        condition: service_started
+      - dockerapi
+      - mysql
     dns:
       - ${IPV4_NETWORK:-172.22.1}.254
     environment:
@@ -283,8 +280,7 @@ services:
         ipv4_address: ${IPV4_NETWORK:-172.22.1}.248
 
   netfilter:
-    build:
-      context: .
+    build: backend
     command: netfilter
     stop_grace_period: 30s
     restart: always
@@ -304,8 +300,7 @@ services:
       - /lib/modules:/lib/modules:ro
 
   dockerapi:
-    build:
-      context: .
+    build: backend
     command: uvicorn --host=0.0.0.0 --port=80 taram.dockerapi:app
     security_opt:
       - label=disable

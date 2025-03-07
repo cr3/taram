@@ -6,9 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -25,24 +22,3 @@ jobs:
             git checkout ${{ secrets.MAIN_BRANCH }}
             git pull
             make deploy
-
-  docs:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out
-        uses: actions/checkout@v3
-
-      - name: Set up the environment
-        uses: ./.github/actions/setup-poetry-env
-        with:
-          poetry-options: --with docs
-
-      - name: Run docs target
-        run: |
-          make docs
-          touch build/html/.nojekyll
-
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: build/html

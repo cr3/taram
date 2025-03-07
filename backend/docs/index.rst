@@ -32,14 +32,10 @@ method, this part of the documentation is for you.
 
    modules
 
-
 Additional Notes
 ----------------
 
 .. toctree::
    :maxdepth: 2
 
-   contributing
    style_guide
-   license
-   changes
