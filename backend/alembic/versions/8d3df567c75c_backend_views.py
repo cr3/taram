@@ -7,7 +7,6 @@ Create Date: 2025-02-01 21:19:15.965541
 """
 
 from collections.abc import Sequence
-from typing import Union
 
 from alembic import op
 from taram.views import (
@@ -19,9 +18,9 @@ from taram.views import (
 
 # revision identifiers, used by Alembic.
 revision: str = "8d3df567c75c"
-down_revision: Union[str, None] = "a465e415e03d"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = "a465e415e03d"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:

@@ -1,7 +1,6 @@
 """Pydantic schemas."""
 
 from datetime import datetime as dt
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -36,7 +35,7 @@ class DomainDetails(BaseModel):
     mboxes_in_domain: int
     mboxes_left: int
     domain: str
-    description: Optional[str]
+    description: str | None
     max_num_aliases_for_domain: int
     max_num_mboxes_for_domain: int
     def_quota_for_mbox: int
@@ -54,17 +53,17 @@ class DomainDetails(BaseModel):
 
 class DomainUpdate(BaseModel):
 
-    description: Optional[str] = None
-    aliases: Optional[int] = None
-    mailboxes: Optional[int] = None
-    defquota: Optional[int] = None
-    maxquota: Optional[int] = None
-    quota: Optional[int] = None
-    active: Optional[bool] = None
-    gal: Optional[bool] = None
-    backupmx: Optional[int] = None
-    relay_all_recipients: Optional[bool] = None
-    relay_unknown_only: Optional[bool] = None
+    description: str | None = None
+    aliases: int | None = None
+    mailboxes: int | None = None
+    defquota: int | None = None
+    maxquota: int | None = None
+    quota: int | None = None
+    active: bool | None = None
+    gal: bool | None = None
+    backupmx: int | None = None
+    relay_all_recipients: bool | None = None
+    relay_unknown_only: bool | None = None
 
 
 class MailboxCreate(BaseModel):
@@ -123,27 +122,27 @@ class MailboxDetails(BaseModel):
     pop3_access: bool
     smtp_access: bool
     sieve_access: bool
-    last_imap_login: Optional[dt]
-    last_smtp_login: Optional[dt]
-    last_pop3_login: Optional[dt]
-    last_sso_login: Optional[dt]
+    last_imap_login: dt | None
+    last_smtp_login: dt | None
+    last_pop3_login: dt | None
+    last_sso_login: dt | None
 
 
 class MailboxUpdate(BaseModel):
 
-    password: Optional[str] = None
-    password2: Optional[str] = None
-    name: Optional[str] = None
-    quota: Optional[int] = None
-    quarantine_notification: Optional[str] = None
-    quarantine_category: Optional[str] = None
-    active: Optional[bool] = None
-    force_pw_update: Optional[bool] = None
-    tls_enforce_in: Optional[bool] = None
-    tls_enforce_out: Optional[bool] = None
-    relayhost: Optional[bool] = None
-    sogo_access: Optional[bool] = None
-    imap_access: Optional[bool] = None
-    pop3_access: Optional[bool] = None
-    smtp_access: Optional[bool] = None
-    sieve_access: Optional[bool] = None
+    password: str | None = None
+    password2: str | None = None
+    name: str | None = None
+    quota: int | None = None
+    quarantine_notification: str | None = None
+    quarantine_category: str | None = None
+    active: bool | None = None
+    force_pw_update: bool | None = None
+    tls_enforce_in: bool | None = None
+    tls_enforce_out: bool | None = None
+    relayhost: bool | None = None
+    sogo_access: bool | None = None
+    imap_access: bool | None = None
+    pop3_access: bool | None = None
+    smtp_access: bool | None = None
+    sieve_access: bool | None = None
