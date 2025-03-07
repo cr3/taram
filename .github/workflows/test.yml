@@ -13,15 +13,12 @@ jobs:
       - name: Check out
         uses: actions/checkout@v3
 
-      - uses: actions/cache@v3
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
-
-      - name: Set up the environment
+      - name: Set up Python environment
         uses: ./.github/actions/setup-poetry-env
         with:
-          poetry-options: --only check
+          poetry-options: --only=check
+          python-version: "3.11"
+          working-directory: backend
 
       - name: Run check target
         run: make check
@@ -45,6 +42,7 @@ jobs:
         uses: ./.github/actions/setup-poetry-env
         with:
           python-version: ${{ matrix.python-version }}
+          working-directory: backend
 
       - name: Run test target
         run: make test
@@ -53,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-data-${{ matrix.python-version }}
-          path: .coverage.*
+          path: backend/.coverage.*
           if-no-files-found: ignore
           include-hidden-files: true
 
@@ -69,7 +67,8 @@ jobs:
         uses: ./.github/actions/setup-poetry-env
         with:
           python-version: "3.11"
-          poetry-options: --only test
+          poetry-options: --only=test
+          working-directory: backend
 
       - name: Download coverage data
         uses: actions/download-artifact@v4
