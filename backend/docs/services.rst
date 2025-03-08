@@ -1,10 +1,10 @@
 Services
 ========
 
-Backend
--------
+API
+---
 
-The Backend is a RESTful API that provides a programmatic way to manage
+The API is a RESTful interface that provides a programmatic way to manage
 mail server functionalities. Here’s why it’s useful:
 
 * **Automation**
@@ -23,7 +23,7 @@ mail server functionalities. Here’s why it’s useful:
   the API simplifies operations by providing a consistent and predictable
   way to execute tasks.
 
-In short, the Backend exists to make it easier to manage and extend its
+In short, the API exists to make it easier to manage and extend its
 functionality in flexible and efficient ways.
 
 ClamAV

@@ -3,7 +3,7 @@ Version 0.2.0
 
 Released 2025-02-12
 
--   Add Backend service.
+-   Add API service.
 -   Add Clamd service.
 -   Add DockerAPI service.
 -   Add Dovecot service.
