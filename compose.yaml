@@ -15,7 +15,6 @@ services:
 
   memcached:
     image: memcached:alpine
-    command: memcached -vv
     restart: always
     networks:
       mail-network:

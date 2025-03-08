@@ -1,6 +1,8 @@
 """Service fixtures."""
 
 import os
+from functools import partial
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from textwrap import dedent
 
@@ -38,14 +40,36 @@ def env_file(project):
 
 
 @pytest.fixture(scope="session")
-def backend_service(env_file, project, process):
-    """Backend service fixture."""
-    server = ComposeServer(
-        "Uvicorn running on",
-        env_file=env_file,
+def compose_files(request):
+    directory = Path(request.config.rootdir)
+    filenames = ["docker-compose.yml", "compose.yaml", "compose.yml"]
+    while True:
+        for filename in filenames:
+            path = directory / filename
+            if path.exists():
+                return list(directory.glob(f"{path.stem}.*"))
+
+        if directory == directory.parent:
+            raise KeyError("Docker compose file not found")
+
+        directory = directory.parent
+
+
+@pytest.fixture(scope="session")
+def compose_server(project, env_file, compose_files, process):
+    return partial(
+        ComposeServer,
         project=project,
+        env_file=env_file,
+        compose_files=compose_files,
         process=process,
     )
+
+
+@pytest.fixture(scope="session")
+def backend_service(compose_server):
+    """Backend service fixture."""
+    server = compose_server("Uvicorn running on")
     with server.run("backend") as service:
         yield service
 
@@ -57,26 +81,17 @@ def backend_session(backend_service):
 
 
 @pytest.fixture(scope="session")
-def clamd_service(project, process):
+def clamd_service(compose_server):
     """Clamd service fixture."""
-    server = ComposeServer(
-        "socket found, clamd started",
-        project=project,
-        process=process,
-    )
+    server = compose_server("socket found, clamd started")
     with server.run("clamd") as service:
         yield service
 
 
 @pytest.fixture(scope="session")
-def dockerapi_service(env_file, project, process):
+def dockerapi_service(compose_server):
     """Dockerapi service fixture."""
-    server = ComposeServer(
-        "Uvicorn running on",
-        env_file=env_file,
-        project=project,
-        process=process,
-    )
+    server = compose_server("Uvicorn running on")
     with server.run("dockerapi") as service:
         yield service
 
@@ -88,66 +103,41 @@ def dockerapi_session(dockerapi_service):
 
 
 @pytest.fixture(scope="session")
-def dovecot_service(env_file, project, process):
+def dovecot_service(compose_server):
     """Dovecot service fixture."""
-    server = ComposeServer(
-        "dovecot entered RUNNING state",
-        env_file=env_file,
-        project=project,
-        process=process,
-    )
+    server = compose_server("dovecot entered RUNNING state")
     with server.run("dovecot") as service:
         yield service
 
 
 @pytest.fixture(scope="session")
-def memcached_service(env_file, project, process):
+def memcached_service(compose_server):
     """Memcached service fixture."""
-    server = ComposeServer(
-        "server listening",
-        env_file=env_file,
-        project=project,
-        process=process,
-    )
+    server = compose_server("server listening")
     with server.run("memcached") as service:
         yield service
 
 
 @pytest.fixture(scope="session")
-def mysql_service(env_file, project, process):
+def mysql_service(compose_server):
     """MySQL service fixture."""
-    server = ComposeServer(
-        "mysqld: ready for connections",
-        env_file=env_file,
-        project=project,
-        process=process,
-    )
+    server = compose_server("mysqld: ready for connections")
     with server.run("mysql") as service:
         yield service
 
 
 @pytest.fixture(scope="session")
-def postfix_service(env_file, project, process):
+def postfix_service(compose_server):
     """Postfix service fixture."""
-    server = ComposeServer(
-        "starting the Postfix mail system",
-        env_file=env_file,
-        project=project,
-        process=process,
-    )
+    server = compose_server("starting the Postfix mail system")
     with server.run("postfix") as service:
         yield service
 
 
 @pytest.fixture(scope="session")
-def redis_service(env_file, project, process):
+def redis_service(compose_server):
     """Redis service fixture."""
-    server = ComposeServer(
-        "Ready to accept connections tcp",
-        env_file=env_file,
-        project=project,
-        process=process,
-    )
+    server = compose_server("Ready to accept connections tcp")
     with server.run("redis") as service:
         yield service
 
@@ -167,38 +157,24 @@ def redis_client(redis_service):
 
 
 @pytest.fixture(scope="session")
-def rspamd_service(redis_service, env_file, project, process):
+def rspamd_service(redis_service, compose_server):
     """Rspamd service fixture."""
-    server = ComposeServer(
-        "listening for control commands",
-        env_file=env_file,
-        project=project,
-        process=process,
-    )
+    server = compose_server("listening for control commands")
     with server.run("rspamd") as service:
         yield service
 
 
 @pytest.fixture(scope="session")
-def sogo_service(redis_service, env_file, project, process):
+def sogo_service(redis_service, compose_server):
     """SOGo service fixture."""
-    server = ComposeServer(
-        "notified the watchdog that we are ready",
-        env_file=env_file,
-        project=project,
-        process=process,
-    )
+    server = compose_server("notified the watchdog that we are ready")
     with server.run("sogo") as service:
         yield service
 
 
 @pytest.fixture(scope="session")
-def unbound_service(project, process):
+def unbound_service(compose_server):
     """Unbound service fixture."""
-    server = ComposeServer(
-        "start of service",
-        project=project,
-        process=process,
-    )
+    server = compose_server("start of service")
     with server.run("unbound") as service:
         yield service

@@ -45,12 +45,13 @@ class ComposeService:
 
 
 class ComposeServer(ProcessServer):
-    def __init__(self, pattern, project="test", env_file="/dev/null", **kwargs):
+    def __init__(self, pattern, project="test", env_file=None, compose_files=None, **kwargs):
         """Initilize a compose server."""
         super().__init__(**kwargs)
         self.pattern = pattern
         self.project = project
         self.env_file = env_file
+        self.compose_files = compose_files
 
     def __repr__(self):
         return "{cls}(pattern={pattern!r}, project={project!r})".format(
@@ -65,10 +66,14 @@ class ComposeServer(ProcessServer):
     def prepare_func(self, controldir):
         """Prepare the function to run the compose service."""
         full_name = self.full_name(controldir.basename)
+        compose = xdocker.compose().with_project_name(self.project)
+        if env_file := self.env_file:
+            compose = compose.with_env_file(env_file)
+        for file in self.compose_files or []:
+            compose = compose.with_file(file)
+
         command = (
-            xdocker.compose()
-            .with_project_name(self.project)
-            .with_env_file(self.env_file)
+            compose
             .run(controldir.basename)
             .with_name(full_name)
             .with_build()

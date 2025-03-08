@@ -1,0 +1,3 @@
+services:
+  memcached:
+    command: memcached -vv
