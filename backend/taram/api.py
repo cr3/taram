@@ -1,4 +1,4 @@
-"""Backend API."""
+"""API service."""
 
 import logging
 from typing import Annotated

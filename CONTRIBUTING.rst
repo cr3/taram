@@ -192,11 +192,11 @@ Upgrading the database
 ----------------------
 
 Auto-generate up upgrade scripts under the ``alembic/versions`` directory
-using a service like ``backend``:
+using a service like ``api``:
 
 .. code-block:: text
 
-    > docker compose run -u $(id -u):$(id -g) -v $(pwd)/alembic:/app/alembic --build backend \
+    > docker compose run -u $(id -u):$(id -g) -v $(pwd)/backend/alembic:/app/alembic --build api \
       bash -c "alembic upgrade head && alembic revision --autogenerate -m 'my message'"
 
 Read more about `Alembic <https://alembic.sqlalchemy.org/en/latest/>`__.

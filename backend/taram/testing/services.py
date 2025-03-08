@@ -67,17 +67,17 @@ def compose_server(project, env_file, compose_files, process):
 
 
 @pytest.fixture(scope="session")
-def backend_service(compose_server):
-    """Backend service fixture."""
+def api_service(compose_server):
+    """API service fixture."""
     server = compose_server("Uvicorn running on")
-    with server.run("backend") as service:
+    with server.run("api") as service:
         yield service
 
 
 @pytest.fixture(scope="session")
-def backend_session(backend_service):
-    """Backend HTTP session to the service fixture."""
-    return HTTPSession.with_origin(f"http://{backend_service.ip}/")
+def api_session(api_service):
+    """API HTTP session to the service fixture."""
+    return HTTPSession.with_origin(f"http://{api_service.ip}/")
 
 
 @pytest.fixture(scope="session")

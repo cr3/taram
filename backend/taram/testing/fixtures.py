@@ -11,10 +11,10 @@ from taram.testing.logger import LoggerHandler
 
 
 @pytest.fixture
-def backend_app(db_session):
+def api_app(db_session):
     from fastapi.testclient import TestClient
 
-    from taram.backend import app
+    from taram.api import app
     from taram.db import get_session
 
     def override_get_session():
