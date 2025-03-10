@@ -20,6 +20,7 @@ Configuration
    github
    system
    services
+   technologies
 
 API Reference
 -------------
