@@ -1,13 +1,14 @@
 Version 0.2.0
 -------------
 
-Released 2025-02-12
+Released 2025-03-07
 
 -   Add API service.
 -   Add Clamd service.
 -   Add DockerAPI service.
 -   Add Dovecot service.
 -   Add DynDNS service.
+-   Add Frontend service.
 -   Add Memcached service.
 -   Add Monit service.
 -   Add MySQL service.

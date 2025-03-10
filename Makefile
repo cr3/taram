@@ -1,6 +1,6 @@
 -include .env
 
-SUBDIRS := backend
+SUBDIRS := backend frontend
 TARGETS := setup check test coverage
 
 .PHONY: $(TARGETS) $(SUBDIRS)

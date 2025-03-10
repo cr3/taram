@@ -61,6 +61,16 @@ services:
       mail-network:
         ipv4_address: ${IPV4_NETWORK:-172.22.1}.249
 
+  frontend:
+    build:
+      context: frontend
+      target: prod
+    ports:
+      - "${FRONTEND_PORT:-127.0.0.1:3000}:3000"
+    restart: always
+    networks:
+      - mail-network
+
   api:
     build: backend
     command: >
@@ -321,7 +331,7 @@ services:
       - dockerapi
       - mysql
     ports:
-      - 2812
+      - "${MONIT_PORT:-127.0.0.1:2812}:2812"
     volumes:
       - rspamd-vol-1:/var/lib/rspamd
       - mysql-socket-vol-1:/var/run/mysqld/
