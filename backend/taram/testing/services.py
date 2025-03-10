@@ -28,6 +28,7 @@ def env_file(project):
             DBUSER=test
             DBPASS=test
             DBROOT=test
+            SKIP_FTS=y
             REDISPASS=test
             MAIL_HOSTNAME=test.local
         """).encode())

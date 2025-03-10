@@ -1,5 +1,4 @@
 conf/acl_anyone
-conf/conf.d
 conf/dovecot-master.passwd
 conf/dovecot-master.userdb
 conf/extra.conf
