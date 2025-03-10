@@ -111,6 +111,14 @@ def dovecot_service(compose_server):
 
 
 @pytest.fixture(scope="session")
+def frontend_service(compose_server):
+    """Frontend service fixture."""
+    server = compose_server("ready")
+    with server.run("frontend") as service:
+        yield service
+
+
+@pytest.fixture(scope="session")
 def memcached_service(compose_server):
     """Memcached service fixture."""
     server = compose_server("server listening")

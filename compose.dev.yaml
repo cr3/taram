@@ -1,3 +1,9 @@
 services:
   memcached:
     command: memcached -vv
+
+  frontend:
+    build:
+      target: dev
+    environment:
+      NODE_ENV: development

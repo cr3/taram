@@ -1,0 +1,3 @@
+check program frontend with path "/opt/monit/scripts/monit-frontend"
+  restart program = "/usr/bin/curl --silent -X POST http://dockerapi/services/frontend/restart"
+  if status != 0 for 3 cycles then restart

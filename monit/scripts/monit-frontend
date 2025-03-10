@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+err_count=0
+
+/usr/lib/nagios/plugins/check_http -4 -H frontend -u / -p 3000
+err_count=$(( ${err_count} + $? ))
+
+exit $err_count
