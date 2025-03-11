@@ -1,12 +1,12 @@
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from taram.db import get_url
+from taram.db import get_db_url
 from taram.models import SQLModel
 
 config = context.config
 
-sqlalchemy_url = get_url().render_as_string(hide_password=False)
+sqlalchemy_url = get_db_url().render_as_string(hide_password=False)
 config.set_main_option("sqlalchemy.url", sqlalchemy_url)
 
 target_metadata = SQLModel.metadata

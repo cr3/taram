@@ -3,9 +3,9 @@ from contextlib import suppress
 from attrs import define
 from sqlalchemy import or_, select
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 
+from taram.db import DBSession
 from taram.http import HTTPSession
 from taram.models import (
     AliasDomainModel,
@@ -29,7 +29,7 @@ from taram.units import mebi
 @define(frozen=True)
 class DomainManager:
 
-    db_session: Session
+    db_session: DBSession
     dockerapi_session: HTTPSession = HTTPSession("http://dockerapi/")
 
     def get_origin_domain(self, domain):

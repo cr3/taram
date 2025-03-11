@@ -3,13 +3,13 @@
 import pytest
 from sqlalchemy import create_engine
 
-from taram.db import get_url
+from taram.db import get_db_url
 
 
 @pytest.fixture(scope="session")
 def db_url(mysql_client):
     """Create a SQLAlchemy engine."""
-    return get_url()
+    return get_db_url()
 
 
 @pytest.fixture(scope="session")

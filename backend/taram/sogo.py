@@ -2,9 +2,9 @@
 
 from attrs import define, field
 from sqlalchemy import insert, select, text
-from sqlalchemy.orm import Session
 from sqlalchemy.sql import case, func
 
+from taram.db import DBSession
 from taram.memcached import Memcached
 from taram.models import (
     MailboxModel,
@@ -28,7 +28,7 @@ from taram.views import (
 @define(frozen=True)
 class Sogo:
 
-    db_session: Session
+    db_session: DBSession
     memcached: Memcached = field(factory=Memcached.from_default)
     default_password: str = "{SSHA256}A123A123A321A321A321B321B321B123B123B321B432F123E321123123321321"
 

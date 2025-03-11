@@ -12,9 +12,8 @@ from fastapi import (
 )
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy.orm import Session
 
-from taram.db import get_session
+from taram.db import DBSession, get_db_session
 from taram.domain import DomainManager
 from taram.schemas import (
     DomainCreate,
@@ -24,19 +23,19 @@ from taram.schemas import (
 
 logger = logging.getLogger("uvicorn")
 
-SessionDep = Annotated[Session, Depends(get_session)]
+DBSessionDep = Annotated[DBSession, Depends(get_db_session)]
 
 app = FastAPI(docs_url="/swagger")
 
 
 @app.get("/domains")
-def get_domains(session: SessionDep) -> list[str]:
+def get_domains(session: DBSessionDep) -> list[str]:
     mailbox = DomainManager(session)
     return [d.domain for d in mailbox.get_domains()]
 
 
 @app.post("/domains")
-def post_domain(session: SessionDep, domain_create: DomainCreate) -> DomainDetails:
+def post_domain(session: DBSessionDep, domain_create: DomainCreate) -> DomainDetails:
     mailbox = DomainManager(session)
     domain = mailbox.create_domain(domain_create)
     session.commit()
@@ -44,13 +43,13 @@ def post_domain(session: SessionDep, domain_create: DomainCreate) -> DomainDetai
 
 
 @app.get("/domains/{domain}")
-def get_domain(domain: str, session: SessionDep) -> DomainDetails:
+def get_domain(domain: str, session: DBSessionDep) -> DomainDetails:
     mailbox = DomainManager(session)
     return mailbox.get_domain_details(domain)
 
 
 @app.put("/domains/{domain}")
-def put_domain(domain: str, domain_update: DomainUpdate, session: SessionDep) -> DomainDetails:
+def put_domain(domain: str, domain_update: DomainUpdate, session: DBSessionDep) -> DomainDetails:
     mailbox = DomainManager(session)
     domain = mailbox.update_domain(domain, domain_update)
     session.commit()
@@ -58,7 +57,7 @@ def put_domain(domain: str, domain_update: DomainUpdate, session: SessionDep) ->
 
 
 @app.delete("/domains/{domain}")
-def delete_domain(domain: str, session: SessionDep) -> None:
+def delete_domain(domain: str, session: DBSessionDep) -> None:
     mailbox = DomainManager(session)
     mailbox.delete_domain(domain)
     session.commit()
@@ -73,7 +72,7 @@ def get_sogo_auth(response: Response) -> None:
 
 @app.exception_handler(KeyError)
 async def key_error_handler(request: Request, exc: KeyError):
-    raise HTTPException(404, "Domain not found") from exc
+    raise HTTPException(404, "Item not found") from exc
 
 
 app.mount("/docs", StaticFiles(directory="./build/html", html=True, check_dir=False))
