@@ -61,11 +61,16 @@ taram = "taram.testing.fixtures"
 taram-db = "taram.testing.db"
 taram-managers = "taram.testing.managers"
 taram-services = "taram.testing.services"
+taram-store = "taram.testing.store"
 
 [tool.poetry.plugins."pytest_unique"]
 db-model = "taram.testing.unique:unique_db_model"
 db-value = "taram.testing.unique:unique_db_value"
 domain = "taram.testing.unique:unique_domain"
+
+[tool.poetry.plugins."taram_store"]
+memory = "taram.store:MemoryStore"
+redis = "taram.store:RedisStore"
 
 [tool.poetry.scripts]
 netfilter = "taram.netfilter:main"
