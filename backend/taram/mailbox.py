@@ -1,9 +1,9 @@
 from attrs import Factory, define, field
 from passlib.hash import bcrypt
 from sqlalchemy import or_
-from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 
+from taram.db import DBSession
 from taram.models import (
     AliasModel,
     BccMapsModel,
@@ -31,7 +31,7 @@ from taram.units import mebi
 @define(frozen=True)
 class MailboxManager:
 
-    db_session: Session
+    db_session: DBSession
     sogo: Sogo = field(
         default=Factory(lambda self: Sogo(self.db_session), takes_self=True),
     )

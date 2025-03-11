@@ -15,15 +15,15 @@ def api_app(db_session):
     from fastapi.testclient import TestClient
 
     from taram.api import app
-    from taram.db import get_session
+    from taram.db import get_db_session
 
-    def override_get_session():
+    def override_get_db_session():
         try:
             yield db_session
         finally:
             db_session.close()
 
-    app.dependency_overrides[get_session] = override_get_session
+    app.dependency_overrides[get_db_session] = override_get_db_session
 
     env = {
         "DBDRIVER": "sqlite",

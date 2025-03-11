@@ -4,10 +4,10 @@ import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session as DBSession
 
 
-def get_url(env=os.environ):
+def get_db_url(env=os.environ) -> URL:
     """Return a database URL from DB variables in the environment."""
     return URL.create(
         drivername=env["DBDRIVER"],
@@ -19,9 +19,9 @@ def get_url(env=os.environ):
     )
 
 
-def get_session(env=os.environ):
+def get_db_session(env=os.environ) -> DBSession:
     """Yield a database session."""
-    url = get_url(env)
+    url = get_db_url(env)
     engine = create_engine(url)
-    with Session(engine) as session:
+    with DBSession(engine) as session:
         yield session

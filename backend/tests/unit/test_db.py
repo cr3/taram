@@ -2,7 +2,7 @@
 
 import pytest
 
-from taram.db import get_url
+from taram.db import get_db_url
 
 
 @pytest.mark.parametrize(
@@ -15,7 +15,7 @@ from taram.db import get_url
         ({"DBDRIVER": "driver", "DBNAME": "name"}, "driver:///name"),
     ],
 )
-def test_get_url(env, expected):
-    """Getting a URL should get DB variables from the environment."""
-    url = get_url(env)
+def test_get_db_url(env, expected):
+    """Getting a database URL should get DB variables from the environment."""
+    url = get_db_url(env)
     assert url.render_as_string(hide_password=False) == expected
