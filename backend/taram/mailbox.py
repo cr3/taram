@@ -31,14 +31,14 @@ from taram.units import mebi
 @define(frozen=True)
 class MailboxManager:
 
-    db_session: DBSession
+    db: DBSession
     sogo: Sogo = field(
-        default=Factory(lambda self: Sogo(self.db_session), takes_self=True),
+        default=Factory(lambda self: Sogo(self.db), takes_self=True),
     )
 
     def get_mailbox_details(self, username):
         mailbox, quota2, attributes = (
-            self.db_session.query(MailboxModel, Quota2Model, UserAttributesModel)
+            self.db.query(MailboxModel, Quota2Model, UserAttributesModel)
             .filter_by(kind="", username=username)
             .join(Quota2Model, Quota2Model.username == MailboxModel.username)
             .join(UserAttributesModel, UserAttributesModel.username == MailboxModel.username)
@@ -46,7 +46,7 @@ class MailboxManager:
         )
 
         logs = (
-            self.db_session.query(func.max(SaslLogModel.datetime), SaslLogModel.service)
+            self.db.query(func.max(SaslLogModel.datetime), SaslLogModel.service)
             .filter_by(username=username)
             .order_by(SaslLogModel.service.desc())
             .all()
@@ -161,7 +161,7 @@ class MailboxManager:
             quarantine_notification=mailbox_create.quarantine_notification,
             quarantine_category=mailbox_create.quarantine_category,
         )
-        self.db_session.add_all([
+        self.db.add_all([
             mailbox,
             quota2,
             quota2replica,
@@ -180,12 +180,12 @@ class MailboxManager:
         details = self.get_mailbox_details(username)
 
         # Update mailbox values.
-        mailbox = self.db_session.query(MailboxModel).filter_by(username=username).one()
+        mailbox = self.db.query(MailboxModel).filter_by(username=username).one()
         if mailbox_update.name is not None:
             mailbox.name = mailbox_update.name
 
         if mailbox_update.active is not None:
-            self.db_session.query(AliasModel).filter_by(username=username).update({"active": mailbox_update.active})
+            self.db.query(AliasModel).filter_by(username=username).update({"active": mailbox_update.active})
             mailbox.active = mailbox_update.active
 
         if mailbox_update.password:
@@ -206,7 +206,7 @@ class MailboxManager:
             mailbox.quota = mailbox_update.quota
 
         # Update mailbox attributes.
-        attributes = self.db_session.query(UserAttributesModel).filter_by(username=username).one()
+        attributes = self.db.query(UserAttributesModel).filter_by(username=username).one()
         for key, value in mailbox_update.model_dump().items():
             if value is not None and hasattr(attributes, key):
                 setattr(attributes, key, value)
@@ -218,23 +218,23 @@ class MailboxManager:
         return mailbox
 
     def delete_mailbox(self, username):
-        self.db_session.query(AliasModel).filter_by(goto=username).delete()
-        # self.db_session.query(PushoverModel).filter_by(username=username).delete()
-        # self.db_session.query(QuarantineModel).filter_by(rcpt=username).delete()
-        self.db_session.query(Quota2Model).filter_by(username=username).delete()
-        self.db_session.query(Quota2ReplicaModel).filter_by(username=username).delete()
-        self.db_session.query(MailboxModel).filter_by(username=username).delete()
-        self.db_session.query(SenderAclModel).filter_by(
+        self.db.query(AliasModel).filter_by(goto=username).delete()
+        # self.db.query(PushoverModel).filter_by(username=username).delete()
+        # self.db.query(QuarantineModel).filter_by(rcpt=username).delete()
+        self.db.query(Quota2Model).filter_by(username=username).delete()
+        self.db.query(Quota2ReplicaModel).filter_by(username=username).delete()
+        self.db.query(MailboxModel).filter_by(username=username).delete()
+        self.db.query(SenderAclModel).filter_by(
             or_(
                 SenderAclModel.logged_in_as == username,
                 SenderAclModel.send_as == username,
             )
         ).delete()
-        self.db_session.query(UserAclModel).filter_by(username=username).delete()
-        self.db_session.query(SpamaliasModel).filter_by(goto=username).delete()
-        self.db_session.query(ImapsyncModel).filter_by(user2=username).delete()
-        self.db_session.query(FilterconfModel).filter_by(object=username).delete()
-        self.db_session.query(BccMapsModel).filter_by(local_dest=username).delete()
+        self.db.query(UserAclModel).filter_by(username=username).delete()
+        self.db.query(SpamaliasModel).filter_by(goto=username).delete()
+        self.db.query(ImapsyncModel).filter_by(user2=username).delete()
+        self.db.query(FilterconfModel).filter_by(object=username).delete()
+        self.db.query(BccMapsModel).filter_by(local_dest=username).delete()
         self.sogo.delete_user(username)
         self.sogo.update_static_view(username)
 
@@ -244,7 +244,7 @@ class MailboxManager:
 
     def _get_mailbox_data(self, domain):
         return (
-            self.db_session.query(
+            self.db.query(
                 func.count(MailboxModel.username).label("count"),
                 func.coalesce(func.round(func.sum(MailboxModel.quota) / mebi), 0).label("quota"),
             )
@@ -254,4 +254,4 @@ class MailboxManager:
         )
 
     def _get_domain_data(self, domain):
-        return self.db_session.query(DomainModel).filter_by(domain=domain).one()
+        return self.db.query(DomainModel).filter_by(domain=domain).one()

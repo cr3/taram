@@ -29,19 +29,19 @@ from taram.units import mebi
 @define(frozen=True)
 class DomainManager:
 
-    db_session: DBSession
+    db: DBSession
     dockerapi_session: HTTPSession = HTTPSession("http://dockerapi/")
 
     def get_origin_domain(self, domain):
         with suppress(NoResultFound):
-            domain = self.db_session.query(AliasDomainModel).filter_by(alias_domain=domain).one().target_domain
+            domain = self.db.query(AliasDomainModel).filter_by(alias_domain=domain).one().target_domain
 
         return domain
 
     def get_domain_details(self, domain):
         domain = self.get_origin_domain(domain)
         try:
-            model = self.db_session.query(DomainModel).filter_by(domain=domain).one()
+            model = self.db.query(DomainModel).filter_by(domain=domain).one()
         except NoResultFound as e:
             raise KeyError(f"Domain not found: {domain}") from e
 
@@ -84,11 +84,11 @@ class DomainManager:
         )
 
     def get_domains(self):
-        return self.db_session.query(DomainModel).filter_by(active=True).all()
+        return self.db.query(DomainModel).filter_by(active=True).all()
 
     def create_domain(self, domain_create: DomainCreate):
         domain = domain_create.domain.lower().strip()
-        if self.db_session.query(DomainModel).filter_by(domain=domain).count():
+        if self.db.query(DomainModel).filter_by(domain=domain).count():
             raise KeyError("domain exists already")
 
         model = DomainModel(
@@ -106,11 +106,11 @@ class DomainManager:
             active=domain_create.active,
         ).validate()
 
-        self.db_session.query(SenderAclModel).filter(
+        self.db.query(SenderAclModel).filter(
             SenderAclModel.external == 1,
             SenderAclModel.send_as.like(f"%@{model.domain}"),
         ).delete()
-        self.db_session.add(model)
+        self.db.add(model)
 
         if domain_create.restart_sogo:
             self.dockerapi_session.post("/services/sogo/restart")
@@ -121,7 +121,7 @@ class DomainManager:
 
     def update_domain(self, domain, domain_update: DomainUpdate):
         details = self.get_domain_details(domain)
-        model = self.db_session.query(DomainModel).filter_by(domain=domain).one()
+        model = self.db.query(DomainModel).filter_by(domain=domain).one()
         model.mailoxes = details.max_num_mboxes_for_domain
         model.defquota = details.def_quota_for_mbox / mebi
         model.maxquota = details.max_quota_for_mbox / mebi
@@ -147,25 +147,25 @@ class DomainManager:
         return model
 
     def delete_domain(self, domain):
-        count = self.db_session.query(func.count(MailboxModel.username)).filter_by(domain=domain).scalar()
+        count = self.db.query(func.count(MailboxModel.username)).filter_by(domain=domain).scalar()
         if count:
             raise ValueError("domain not empty")
 
         # TODO: cleanup dovecot
         # TODO: cleanup redis
-        self.db_session.query(DomainModel).filter_by(domain=domain).delete()
-        self.db_session.query(AliasModel).filter_by(domain=domain).delete()
-        self.db_session.query(AliasDomainModel).filter_by(target_domain=domain).delete()
-        self.db_session.query(MailboxModel).filter_by(domain=domain).delete()
-        self.db_session.query(SenderAclModel).filter(SenderAclModel.logged_in_as.like(domain)).delete()
-        self.db_session.query(Quota2Model).filter(Quota2Model.username.like(domain)).delete()
-        self.db_session.query(Quota2ReplicaModel).filter(Quota2ReplicaModel.username.like(domain)).delete()
-        self.db_session.query(SpamaliasModel).filter(SpamaliasModel.address.like(domain)).delete()
-        self.db_session.query(BccMapsModel).filter_by(local_dest=domain).delete()
+        self.db.query(DomainModel).filter_by(domain=domain).delete()
+        self.db.query(AliasModel).filter_by(domain=domain).delete()
+        self.db.query(AliasDomainModel).filter_by(target_domain=domain).delete()
+        self.db.query(MailboxModel).filter_by(domain=domain).delete()
+        self.db.query(SenderAclModel).filter(SenderAclModel.logged_in_as.like(domain)).delete()
+        self.db.query(Quota2Model).filter(Quota2Model.username.like(domain)).delete()
+        self.db.query(Quota2ReplicaModel).filter(Quota2ReplicaModel.username.like(domain)).delete()
+        self.db.query(SpamaliasModel).filter(SpamaliasModel.address.like(domain)).delete()
+        self.db.query(BccMapsModel).filter_by(local_dest=domain).delete()
 
     def _get_mailbox_data(self, domain):
         return (
-            self.db_session.query(
+            self.db.query(
                 func.count(MailboxModel.username).label("count"),
                 func.coalesce(func.round(MailboxModel.quota / mebi), 0).label("biggest_mailbox"),
                 func.coalesce(func.round(func.sum(MailboxModel.quota) / mebi), 0).label("quota_all"),
@@ -177,7 +177,7 @@ class DomainManager:
 
     def _get_mailbox_data_domain(self, domain):
         return (
-            self.db_session.query(
+            self.db.query(
                 func.count(MailboxModel.username).label("count"),
                 func.coalesce(func.sum(MailboxModel.quota), 0).label("in_use"),
             )
@@ -188,7 +188,7 @@ class DomainManager:
 
     def _get_alias_data(self, domain):
         return (
-            self.db_session.query(
+            self.db.query(
                 func.count(AliasModel.id).label("count"),
             )
             .filter_by(domain=domain)
@@ -198,22 +198,22 @@ class DomainManager:
 
     def _get_alias_data_domain(self, domain):
         return (
-            self.db_session.query(func.count(AliasModel.address).label("alias_count"))
+            self.db.query(func.count(AliasModel.address).label("alias_count"))
             .filter(
                 or_(
                     AliasModel.domain == domain,
                     AliasModel.domain.in_(
-                        self.db_session.query(AliasDomainModel.alias_domain).filter_by(target_domain=domain)
+                        self.db.query(AliasDomainModel.alias_domain).filter_by(target_domain=domain)
                     ),
                 )
             )
-            .filter(AliasModel.address.not_in(self.db_session.query(MailboxModel.username)))
+            .filter(AliasModel.address.not_in(self.db.query(MailboxModel.username)))
             .one()
         )
 
     def _get_sum_quota_in_use(self, domain):
         return (
-            self.db_session.query(
+            self.db.query(
                 func.sum(Quota2Model.bytes).label("bytes_total"),
                 func.sum(Quota2Model.messages).label("msgs_total"),
             )
