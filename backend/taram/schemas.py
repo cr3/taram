@@ -41,7 +41,7 @@ class DomainDetails(BaseModel):
     def_quota_for_mbox: int
     max_quota_for_mbox: int
     max_quota_for_domain: int
-    relayhost: str
+    relayhost: int
     backupmx: bool
     gal: bool
     active: bool
@@ -80,7 +80,7 @@ class MailboxCreate(BaseModel):
     force_pw_update: bool = False
     tls_enforce_in: bool = False
     tls_enforce_out: bool = False
-    relayhost: bool = False
+    relayhost: int = 0
     sogo_access: bool = True
     imap_access: bool = True
     pop3_access: bool = True
@@ -116,7 +116,7 @@ class MailboxDetails(BaseModel):
     force_pw_update: bool
     tls_enforce_in: bool
     tls_enforce_out: bool
-    relayhost: bool
+    relayhost: int
     sogo_access: bool
     imap_access: bool
     pop3_access: bool
@@ -140,7 +140,7 @@ class MailboxUpdate(BaseModel):
     force_pw_update: bool | None = None
     tls_enforce_in: bool | None = None
     tls_enforce_out: bool | None = None
-    relayhost: bool | None = None
+    relayhost: int | None = None
     sogo_access: bool | None = None
     imap_access: bool | None = None
     pop3_access: bool | None = None

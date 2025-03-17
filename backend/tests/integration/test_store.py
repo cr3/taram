@@ -202,3 +202,11 @@ def test_hdel_many(store, unique):
     store.hset(key, field1, "")
     store.hset(key, field2, "")
     assert store.hdel(key, field1, field2, field3) == 2
+
+
+def test_flushall(store, unique):
+    """Flushing all should delete all keys from the existing databases."""
+    key, value = unique("text"), unique("text")
+    store.set(key, value)
+    store.flushall()
+    assert store.get(key) is None

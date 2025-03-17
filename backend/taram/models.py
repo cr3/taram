@@ -135,7 +135,7 @@ class DomainModel(TimestampMixin, SQLModel):
     defquota: Mapped[int] = mapped_column(BigInteger, server_default=f"{3 * gibi}")
     maxquota: Mapped[int] = mapped_column(BigInteger, server_default=f"{10 * gibi}")
     quota: Mapped[int] = mapped_column(BigInteger, server_default=f"{10 * gibi}")
-    relayhost: Mapped[str] = mapped_column(String(255), server_default="0")
+    relayhost: Mapped[int] = mapped_column(Integer, server_default="0")
     backupmx: Mapped[bool] = mapped_column(server_default="0")
     gal: Mapped[bool] = mapped_column(server_default="1")
     relay_all_recipients: Mapped[bool] = mapped_column(server_default="0")

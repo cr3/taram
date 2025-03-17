@@ -299,10 +299,10 @@ def test_netfilter_tables_run_cmd():
     )
 
 
-def test_netfilter_update_blacklist(store):
+def test_netfilter_update_blacklist(redis_store):
     """Updating the blacklist should get from F2B_BLACKLIST."""
-    store.hset("F2B_BLACKLIST", "127.0.0.1", 1)
-    netfilter = Netfilter(store, None, None)
+    redis_store.hset("F2B_BLACKLIST", "127.0.0.1", 1)
+    netfilter = Netfilter(redis_store, None, None)
     assert netfilter.whitelist == set()
 
     with patch.object(Netfilter, "perm_ban") as perm_ban:
@@ -312,10 +312,10 @@ def test_netfilter_update_blacklist(store):
     assert netfilter.blacklist == {"127.0.0.1"}
 
 
-def test_netfilter_update_whitelist(store):
+def test_netfilter_update_whitelist(redis_store):
     """Updating the whitelist should get from F2B_WHITELIST."""
-    store.hset("F2B_WHITELIST", "127.0.0.1", 1)
-    netfilter = Netfilter(store, None, None)
+    redis_store.hset("F2B_WHITELIST", "127.0.0.1", 1)
+    netfilter = Netfilter(redis_store, None, None)
     assert netfilter.whitelist == set()
 
     netfilter.update_whitelist()

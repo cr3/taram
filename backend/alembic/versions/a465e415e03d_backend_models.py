@@ -85,7 +85,7 @@ def upgrade() -> None:
         sa.Column("defquota", sa.BigInteger(), server_default="3072", nullable=False),
         sa.Column("maxquota", sa.BigInteger(), server_default="102400", nullable=False),
         sa.Column("quota", sa.BigInteger(), server_default="102400", nullable=False),
-        sa.Column("relayhost", sa.String(length=255), server_default="0", nullable=False),
+        sa.Column("relayhost", sa.Integer(), server_default="0", nullable=False),
         sa.Column("backupmx", sa.Boolean(), server_default="0", nullable=False),
         sa.Column("gal", sa.Boolean(), server_default="1", nullable=False),
         sa.Column("relay_all_recipients", sa.Boolean(), server_default="0", nullable=False),
