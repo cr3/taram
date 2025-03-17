@@ -1,11 +1,12 @@
 """SOGo functions."""
 
+from functools import partial
+
 from attrs import define, field
-from sqlalchemy import insert, select, text
+from sqlalchemy import insert, select
 from sqlalchemy.sql import case, func
 
 from taram.db import DBSession
-from taram.memcached import Memcached
 from taram.models import (
     MailboxModel,
     SogoAclModel,
@@ -18,6 +19,10 @@ from taram.models import (
     SogoUserProfileModel,
     UserAttributesModel,
 )
+from taram.store import (
+    MemcachedStore,
+    Store,
+)
 from taram.views import (
     GroupedDomainAliasAddressView,
     GroupedMailAliasesView,
@@ -29,7 +34,7 @@ from taram.views import (
 class Sogo:
 
     db: DBSession
-    memcached: Memcached = field(factory=Memcached.from_default)
+    memcached: Store = field(factory=partial(MemcachedStore.from_host, "memcached"))
     default_password: str = "{SSHA256}A123A123A321A321A321B321B321B123B123B321B432F123E321123123321321"
 
     def update_static_view(self, mailbox: str):
@@ -67,10 +72,7 @@ class Sogo:
             )
             .select_from(MailboxModel)
             .outerjoin(UserAttributesModel, MailboxModel.username == UserAttributesModel.username)
-            .outerjoin(
-                GroupedMailAliasesView,
-                text("grouped_mail_aliases.username REGEXP '(^|,)' || mailbox.username || '($|,)'"),
-            )
+            .outerjoin(GroupedMailAliasesView, GroupedMailAliasesView.username == MailboxModel.username)
             .outerjoin(GroupedDomainAliasAddressView, MailboxModel.username == GroupedDomainAliasAddressView.username)
             .outerjoin(GroupedSenderAclExternalView, MailboxModel.username == GroupedSenderAclExternalView.username)
             .where(MailboxModel.active.is_(True))
@@ -104,23 +106,23 @@ class Sogo:
             SogoStaticView.c_uid.not_in(select(MailboxModel.username).filter_by(active=True))
         ).delete()
 
-        self.memcached.flush()
+        self.memcached.flushall()
 
     def delete_user(self, username):
         self.db.query(SogoUserProfileModel).filter_by(c_uid=username).delete()
         self.db.query(SogoCacheFolderModel).filter_by(c_uid=username).delete()
         # TODO: Also delete by c_object
         self.db.query(SogoAclModel).filter_by(c_uid=username).delete()
-        folder_ids = self.db.query(SogoFolderInfoModel.c_folder_id).filter(
+        folder_ids = select(SogoFolderInfoModel.c_folder_id).where(
             SogoFolderInfoModel.c_path2 == username
         )
         self.db.query(SogoStoreModel).filter(
-            SogoStoreModel.c_folder_id.in_(folder_ids.subquery()),
+            SogoStoreModel.c_folder_id.in_(folder_ids),
         ).delete()
         self.db.query(SogoQuickContactModel).filter(
-            SogoQuickContactModel.c_folder_id.in_(folder_ids.subquery()),
+            SogoQuickContactModel.c_folder_id.in_(folder_ids),
         ).delete()
         self.db.query(SogoQuickAppointmentModel).filter(
-            SogoQuickAppointmentModel.c_folder_id.in_(folder_ids.subquery()),
+            SogoQuickAppointmentModel.c_folder_id.in_(folder_ids),
         ).delete()
-        folder_ids.delete()
+        self.db.query(SogoFolderInfoModel).filter_by(c_path2=username).delete()

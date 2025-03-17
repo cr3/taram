@@ -40,9 +40,9 @@ def test_domain_manager_create_domain(domain_manager, unique):
     domain = unique("domain")
     domain_create = DomainCreate(domain=domain)
     domain_manager.create_domain(domain_create)
-    domain_manager.dockerapi_session.post.assert_called_once_with("/services/sogo/restart")
-
     domain_manager.db.flush()
+    domain_manager.dockerapi.post.assert_called_once_with("/services/sogo/restart")
+
     result = domain_manager.get_domain_details(domain)
     assert result.domain == domain
 

@@ -1,9 +1,13 @@
+import bcrypt as _bcrypt
 from attrs import Factory, define, field
 from passlib.hash import bcrypt
 from sqlalchemy import or_
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.sql import func
 
-from taram.db import DBSession
+from taram.db import (
+    DBSession,
+)
 from taram.models import (
     AliasModel,
     BccMapsModel,
@@ -11,6 +15,7 @@ from taram.models import (
     FilterconfModel,
     ImapsyncModel,
     MailboxModel,
+    QuarantineModel,
     Quota2Model,
     Quota2ReplicaModel,
     SaslLogModel,
@@ -25,25 +30,35 @@ from taram.schemas import (
     MailboxUpdate,
 )
 from taram.sogo import Sogo
+from taram.store import (
+    RedisStore,
+    Store,
+)
 from taram.units import mebi
 
+# Workaround https://github.com/langflow-ai/langflow/issues/1173
+_bcrypt.__about__ = _bcrypt
 
 @define(frozen=True)
 class MailboxManager:
 
     db: DBSession
+    redis: Store = field(factory=RedisStore.from_env)
     sogo: Sogo = field(
         default=Factory(lambda self: Sogo(self.db), takes_self=True),
     )
 
     def get_mailbox_details(self, username):
-        mailbox, quota2, attributes = (
-            self.db.query(MailboxModel, Quota2Model, UserAttributesModel)
-            .filter_by(kind="", username=username)
-            .join(Quota2Model, Quota2Model.username == MailboxModel.username)
-            .join(UserAttributesModel, UserAttributesModel.username == MailboxModel.username)
-            .one()
-        )
+        try:
+            mailbox, quota2, attributes = (
+                self.db.query(MailboxModel, Quota2Model, UserAttributesModel)
+                .filter_by(kind="", username=username)
+                .join(Quota2Model, Quota2Model.username == MailboxModel.username)
+                .join(UserAttributesModel, UserAttributesModel.username == MailboxModel.username)
+                .one()
+            )
+        except NoResultFound as e:
+            raise KeyError(f"Mailbox not found: {username}") from e
 
         logs = (
             self.db.query(func.max(SaslLogModel.datetime), SaslLogModel.service)
@@ -80,6 +95,9 @@ class MailboxManager:
             last_pop3_login=last_logins.get("pop3"),
             last_sso_login=last_logins.get("SSO"),
         )
+
+    def get_mailboxes(self):
+        return self.db.query(MailboxModel).filter_by(active=True).all()
 
     def create_mailbox(self, mailbox_create: MailboxCreate):
         local_part = mailbox_create.local_part.lower().strip()
@@ -220,11 +238,11 @@ class MailboxManager:
     def delete_mailbox(self, username):
         self.db.query(AliasModel).filter_by(goto=username).delete()
         # self.db.query(PushoverModel).filter_by(username=username).delete()
-        # self.db.query(QuarantineModel).filter_by(rcpt=username).delete()
+        self.db.query(QuarantineModel).filter_by(rcpt=username).delete()
         self.db.query(Quota2Model).filter_by(username=username).delete()
         self.db.query(Quota2ReplicaModel).filter_by(username=username).delete()
         self.db.query(MailboxModel).filter_by(username=username).delete()
-        self.db.query(SenderAclModel).filter_by(
+        self.db.query(SenderAclModel).filter(
             or_(
                 SenderAclModel.logged_in_as == username,
                 SenderAclModel.send_as == username,
@@ -235,12 +253,14 @@ class MailboxManager:
         self.db.query(ImapsyncModel).filter_by(user2=username).delete()
         self.db.query(FilterconfModel).filter_by(object=username).delete()
         self.db.query(BccMapsModel).filter_by(local_dest=username).delete()
+
         self.sogo.delete_user(username)
         self.sogo.update_static_view(username)
 
-        # TODO: auth
+        self.redis.hdel("RL_VALUE", username)
+
+        # TODO: oauth
         # TODO: update aliases
-        # TODO: redis
 
     def _get_mailbox_data(self, domain):
         return (

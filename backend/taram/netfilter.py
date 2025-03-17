@@ -25,7 +25,10 @@ from taram.logger import (
     LoggerLevelAction,
     setup_logger,
 )
-from taram.store import Store
+from taram.store import (
+    RedisStore,
+    Store,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -594,7 +597,7 @@ class NetfilterTables:
 @define
 class Netfilter:
 
-    store = field()
+    redis: Store = field()
     ipv4_tables = field()
     ipv6_tables = field()
     bans = field(factory=dict)
@@ -604,12 +607,12 @@ class Netfilter:
 
     @classmethod
     def from_env(cls, env=os.environ):
-        store = Store.from_env(env)
+        redis = RedisStore.from_env(env)
         name = env.get("NETFILTER_CHAIN_NAME", "MAIL")
         comment = env.get("NETFILTER_CHAIN_COMMENT", "mail")
         ipv4_tables = NetfilterTables(name, comment, "ip").init_chains()
         ipv6_tables = NetfilterTables(name, comment, "ip6").init_chains()
-        return cls(store, ipv4_tables, ipv6_tables)
+        return cls(redis, ipv4_tables, ipv6_tables)
 
     @property
     def f2boptions(self):
@@ -693,7 +696,7 @@ class Netfilter:
                 with self.lock:
                     self.ipv6_tables.ban(net)
 
-            self.store.hset("F2B_ACTIVE_BANS", net, cur_time + net_ban_time)
+            self.redis.hset("F2B_ACTIVE_BANS", net, cur_time + net_ban_time)
         else:
             logger.warning(
                 "%(attempts)d more attempts in the next %(seconds)d seconds until %(net)s is banned",
@@ -707,7 +710,7 @@ class Netfilter:
     def unban(self, net):
         if net not in self.bans:
             logger.info("%(net)s is not banned, skipping unban and deleting from queue (if any)", {"net": net})
-            self.store.hdel("F2B_QUEUE_UNBAN", net)
+            self.redis.hdel("F2B_QUEUE_UNBAN", net)
             return
 
         logger.info(
@@ -723,8 +726,8 @@ class Netfilter:
             with self.lock:
                 self.ipv6_tables.unban(net)
 
-        self.store.hdel("F2B_ACTIVE_BANS", net)
-        self.store.hdel("F2B_QUEUE_UNBAN", net)
+        self.redis.hdel("F2B_ACTIVE_BANS", net)
+        self.redis.hdel("F2B_QUEUE_UNBAN", net)
         if net in self.bans:
             self.bans[net]["attempts"] = 0
             self.bans[net]["ban_counter"] += 1
@@ -746,7 +749,7 @@ class Netfilter:
                     is_banned = self.ipv6_tables.ban(net)
 
         if is_unbanned:
-            self.store.hdel("F2B_PERM_BANS", net)
+            self.redis.hdel("F2B_PERM_BANS", net)
             logger.critical(
                 "Removed host/network %(net)s from blacklist",
                 {
@@ -754,7 +757,7 @@ class Netfilter:
                 },
             )
         elif is_banned:
-            self.store.hset("F2B_PERM_BANS", net, int(round(time.time())))
+            self.redis.hset("F2B_PERM_BANS", net, int(round(time.time())))
             logger.critical(
                 "Added host/network %(net)s to blacklist",
                 {
@@ -764,7 +767,7 @@ class Netfilter:
 
     def autopurge(self):
         max_attempts = self.f2boptions["max_attempts"]
-        queue_unban = self.store.hgetall("F2B_QUEUE_UNBAN")
+        queue_unban = self.redis.hgetall("F2B_QUEUE_UNBAN")
         if queue_unban:
             for net in queue_unban:
                 self.unban(str(net))
@@ -781,7 +784,7 @@ class Netfilter:
             self.ipv6_tables.check_chain_order()
 
     def update_blacklist(self):
-        blacklist = set(self.store.hgetall("F2B_BLACKLIST"))
+        blacklist = set(self.redis.hgetall("F2B_BLACKLIST"))
         new_blacklist = resolve_addresses(blacklist)
         if new_blacklist != self.blacklist:
             addban = new_blacklist.difference(self.blacklist)
@@ -799,7 +802,7 @@ class Netfilter:
                 self.perm_ban(net=net, unban=True)
 
     def update_whitelist(self):
-        whitelist = set(self.store.hgetall("F2B_WHITELIST"))
+        whitelist = set(self.redis.hgetall("F2B_WHITELIST"))
         new_whitelist = resolve_addresses(whitelist)
         with self.lock:
             if new_whitelist != self.whitelist:
@@ -819,8 +822,8 @@ class Netfilter:
             self.ipv4_tables.clear()
             self.ipv6_tables.clear()
             try:
-                self.store.delete("F2B_ACTIVE_BANS")
-                self.store.delete("F2B_PERM_BANS")
+                self.redis.delete("F2B_ACTIVE_BANS")
+                self.redis.delete("F2B_PERM_BANS")
             except Exception:
                 logger.exception("Error clearing store keys F2B_ACTIVE_BANS and F2B_PERM_BANS")
 
@@ -837,7 +840,7 @@ class NetfilterService:
     @classmethod
     def from_netfilter(cls, netfilter):
         # TODO: Store does not really have a pubsub method.
-        pubsub = netfilter.store.pubsub()
+        pubsub = netfilter.redis.pubsub()
         return cls(netfilter, pubsub)
 
     @property

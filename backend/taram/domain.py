@@ -1,6 +1,6 @@
 from contextlib import suppress
 
-from attrs import define
+from attrs import define, field
 from sqlalchemy import or_, select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.sql import func
@@ -23,6 +23,10 @@ from taram.schemas import (
     DomainDetails,
     DomainUpdate,
 )
+from taram.store import (
+    RedisStore,
+    Store,
+)
 from taram.units import mebi
 
 
@@ -30,7 +34,8 @@ from taram.units import mebi
 class DomainManager:
 
     db: DBSession
-    dockerapi_session: HTTPSession = HTTPSession("http://dockerapi/")
+    redis: Store = field(factory=RedisStore.from_env)
+    dockerapi: HTTPSession = HTTPSession("http://dockerapi/")
 
     def get_origin_domain(self, domain):
         with suppress(NoResultFound):
@@ -112,17 +117,19 @@ class DomainManager:
         ).delete()
         self.db.add(model)
 
-        if domain_create.restart_sogo:
-            self.dockerapi_session.post("/services/sogo/restart")
+        self.redis.hset("DOMAIN_MAP", model.domain, 1)
 
-        # TODO: hset DOMAIN_MAP, dkim
+        # TODO: dkim
+
+        if domain_create.restart_sogo:
+            self.dockerapi.post("/services/sogo/restart")
 
         return model
 
     def update_domain(self, domain, domain_update: DomainUpdate):
         details = self.get_domain_details(domain)
         model = self.db.query(DomainModel).filter_by(domain=domain).one()
-        model.mailoxes = details.max_num_mboxes_for_domain
+        model.mailboxes = details.max_num_mboxes_for_domain
         model.defquota = details.def_quota_for_mbox / mebi
         model.maxquota = details.max_quota_for_mbox / mebi
         model.quota = details.max_quota_for_domain / mebi
@@ -152,7 +159,6 @@ class DomainManager:
             raise ValueError("domain not empty")
 
         # TODO: cleanup dovecot
-        # TODO: cleanup redis
         self.db.query(DomainModel).filter_by(domain=domain).delete()
         self.db.query(AliasModel).filter_by(domain=domain).delete()
         self.db.query(AliasDomainModel).filter_by(target_domain=domain).delete()
@@ -162,6 +168,9 @@ class DomainManager:
         self.db.query(Quota2ReplicaModel).filter(Quota2ReplicaModel.username.like(domain)).delete()
         self.db.query(SpamaliasModel).filter(SpamaliasModel.address.like(domain)).delete()
         self.db.query(BccMapsModel).filter_by(local_dest=domain).delete()
+
+        self.redis.hdel("DOMAIN_MAP", domain)
+        self.redis.hdel("RL_VALUE", domain)
 
     def _get_mailbox_data(self, domain):
         return (

@@ -81,3 +81,19 @@ def test_mailbox_manager_update_mailbox_attributes(domain, mailbox_manager):
     mailbox_manager.update_mailbox(mailbox.username, mailbox_update)
     result = mailbox_manager.get_mailbox_details(mailbox.username)
     assert result.sogo_access is False
+
+
+def test_mailox_manager_delete_mailbox(domain, mailbox_manager):
+    """Deleting a domain should delete it from everywhere."""
+    mailbox_create = MailboxCreate(
+        local_part="a",
+        domain=domain,
+        password="x",
+        password2="x",
+    )
+    mailbox = mailbox_manager.create_mailbox(mailbox_create)
+    mailbox_manager.db.flush()
+
+    mailbox_manager.delete_mailbox(f"a@{domain}")
+    with pytest.raises(KeyError):
+        mailbox_manager.get_mailbox_details(mailbox.username)
