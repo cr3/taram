@@ -24,13 +24,13 @@ def memory_store():
 
 
 @pytest.fixture
-def redis_store(redis_service):
+def redis_store(redis_service, env_vars):
     """Redis store fixture."""
     url = URL.build(
         scheme="redis",
         host=redis_service.ip,
         port=6379,
-        password=redis_service.env["REDISPASS"],
+        password=env_vars["REDISPASS"],
     )
     return Store.from_url(url)
 

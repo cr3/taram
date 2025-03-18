@@ -1,10 +1,7 @@
 """Service fixtures."""
 
-import os
 from functools import partial
 from pathlib import Path
-from tempfile import NamedTemporaryFile
-from textwrap import dedent
 
 import pytest
 
@@ -18,26 +15,36 @@ def project():
 
 
 @pytest.fixture(scope="session")
-def env_file(project):
-    # These must be static because they are persisted in mysql-vol-1.
-    with NamedTemporaryFile(delete=False) as tmp:
-        tmp.write(dedent(f"""\
-            COMPOSE_PROJECT_NAME={project}
-            DBDRIVER=mysql
-            DBNAME=test
-            DBUSER=test
-            DBPASS=test
-            DBROOT=test
-            SKIP_FTS=y
-            REDISPASS=test
-            MAIL_HOSTNAME=test.local
-        """).encode())
-        tmp.close()
+def env_vars(project):
+    """Environment variables for the services.
 
-        try:
-            yield tmp.name
-        finally:
-            os.unlink(tmp.name)
+    Static because they are persisted in volumes, e.g. mysql-vol-1.
+    """
+    return {
+        "COMPOSE_PROJECT_NAME": project,
+        "DBDRIVER": "mysql",
+        "DBNAME": "test",
+        "DBUSER": "test",
+        "DBPASS": "test",
+        "DBROOT": "test",
+        "SKIP_FTS": "y",
+        "REDISPASS": "test",
+        "MAIL_HOSTNAME": "test.local",
+    }
+
+
+@pytest.fixture(scope="session")
+def env_file(env_vars, request):
+    """Environment file containing `env_vars`.
+
+    Cached for troubleshooting purposes.
+    """
+    env_file = request.config.cache.makedir("compose") / "env"
+    with env_file.open("w") as f:
+        for k, v in env_vars.items():
+            f.write(f"{k}={v}\n")
+
+    return env_file
 
 
 @pytest.fixture(scope="session")
@@ -104,7 +111,7 @@ def dockerapi_session(dockerapi_service):
 
 
 @pytest.fixture(scope="session")
-def dovecot_service(compose_server):
+def dovecot_service(compose_server, ssl_dir):
     """Dovecot service fixture."""
     server = compose_server("dovecot entered RUNNING state")
     with server.run("dovecot") as service:
@@ -152,7 +159,7 @@ def redis_service(compose_server):
 
 
 @pytest.fixture(scope="session")
-def redis_client(redis_service):
+def redis_client(redis_service, env_vars):
     """Redis client to the service fixture."""
     from redis import StrictRedis
 
@@ -161,7 +168,7 @@ def redis_client(redis_service):
         port=6379,
         decode_responses=True,
         db=0,
-        password=redis_service.env["REDISPASS"],
+        password=env_vars["REDISPASS"],
     )
 
 
