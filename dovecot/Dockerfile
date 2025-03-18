@@ -109,24 +109,29 @@ RUN addgroup -g 5000 vmail \
   && chmod +x /usr/local/bin/gosu \
   && gosu nobody true
 
-COPY trim_logs.sh /usr/local/bin/trim_logs.sh
-COPY clean_q_aged.sh /usr/local/bin/clean_q_aged.sh
-COPY syslog-ng.conf /etc/syslog-ng/syslog-ng.conf
-COPY syslog-ng-redis_slave.conf /etc/syslog-ng/syslog-ng-redis_slave.conf
-COPY imapsync /usr/local/bin/imapsync
-COPY imapsync_runner.pl /usr/local/bin/imapsync_runner.pl
-COPY report-spam.sieve /usr/lib/dovecot/sieve/report-spam.sieve
-COPY report-ham.sieve /usr/lib/dovecot/sieve/report-ham.sieve
-COPY rspamd-pipe-ham /usr/lib/dovecot/sieve/rspamd-pipe-ham
-COPY rspamd-pipe-spam /usr/lib/dovecot/sieve/rspamd-pipe-spam
-COPY sa-rules.sh /usr/local/bin/sa-rules.sh
-COPY maildir_gc.sh /usr/local/bin/maildir_gc.sh
-COPY supervisord.conf /etc/supervisor/supervisord.conf
-COPY stop-supervisor.sh /usr/local/sbin/stop-supervisor.sh
-COPY quarantine_notify.py /usr/local/bin/quarantine_notify.py
-COPY quota_notify.py /usr/local/bin/quota_notify.py
-COPY repl_health.sh /usr/local/bin/repl_health.sh
-COPY optimize-fts.sh /usr/local/bin/optimize-fts.sh
+COPY syslog-ng.conf \
+  syslog-ng-redis_slave.conf \
+  /etc/syslog-ng/
+COPY supervisord.conf \
+  /etc/supervisor/
+COPY report-spam.sieve \
+  report-ham.sieve \
+  rspamd-pipe-ham \
+  rspamd-pipe-spam \
+  /usr/lib/dovecot/sieve/
+COPY trim_logs.sh \
+  clean_q_aged.sh \
+  imapsync \
+  imapsync_runner.pl \
+  sa-rules.sh \
+  maildir_gc.sh \
+  quarantine_notify.py \
+  quota_notify.py \
+  repl_health.sh \
+  optimize-fts.sh \
+  /usr/local/bin/
+COPY stop-supervisor.sh \
+  /usr/local/sbin/
 
 COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
