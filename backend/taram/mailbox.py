@@ -1,6 +1,4 @@
-import bcrypt as _bcrypt
 from attrs import Factory, define, field
-from passlib.hash import bcrypt
 from sqlalchemy import or_
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.sql import func
@@ -24,6 +22,10 @@ from taram.models import (
     UserAclModel,
     UserAttributesModel,
 )
+from taram.password import (
+    hash_password,
+    validate_passwords,
+)
 from taram.schemas import (
     MailboxCreate,
     MailboxDetails,
@@ -36,8 +38,6 @@ from taram.store import (
 )
 from taram.units import mebi
 
-# Workaround https://github.com/langflow-ai/langflow/issues/1173
-_bcrypt.__about__ = _bcrypt
 
 @define(frozen=True)
 class MailboxManager:
@@ -119,10 +119,8 @@ class MailboxManager:
         if mailbox_data.quota + mailbox_create.quota > domain_data.quota:
             raise KeyError("Mailbox quota left exceeded")
 
-        if mailbox_create.password != mailbox_create.password2:
-            raise ValueError("passwords don't match")
-
-        hashed_password = bcrypt.hash(mailbox_create.password)
+        validate_passwords(mailbox_create.password, mailbox_create.password2)
+        hashed_password = hash_password(mailbox_create.password)
 
         mailbox = MailboxModel(
             username=username,
@@ -207,10 +205,8 @@ class MailboxManager:
             mailbox.active = mailbox_update.active
 
         if mailbox_update.password:
-            if mailbox_update.password != mailbox_update.password2:
-                raise ValueError("passwords don't match")
-
-            mailbox.password = bcrypt.hash(mailbox_update.password)
+            validate_passwords(mailbox_update.password, mailbox_update.password2)
+            mailbox.password = hash_password(mailbox_update.password)
 
         if mailbox_update.quota is not None:
             domain_data = self._get_domain_data(details.domain)
