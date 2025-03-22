@@ -12,7 +12,7 @@ COPY --chmod=600 monitrc /etc/monit/monitrc
 COPY conf /etc/monit/conf-enabled
 COPY scripts /opt/monit/scripts
 
-COPY entrypoint.sh /
-ENTRYPOINT ["/entrypoint.sh"]
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 CMD ["monit", "-I", "-B"]

@@ -6,11 +6,11 @@ RUN apk add --update --no-cache \
   bind-tools \
   && install -d -g unbound -m 775 /etc/unbound
 
-COPY healthcheck.sh /
-HEALTHCHECK --interval=30s --timeout=30s CMD [ "/healthcheck.sh" ]
+COPY docker-healthcheck.sh /
+HEALTHCHECK --interval=30s --timeout=30s CMD [ "/docker-healthcheck.sh" ]
 
-COPY entrypoint.sh /
-ENTRYPOINT ["/entrypoint.sh"]
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 EXPOSE 53/udp 53/tcp
 
