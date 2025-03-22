@@ -37,19 +37,24 @@ RUN groupadd -g 102 postfix \
   && printf '#!/bin/bash\n/usr/sbin/postconf -c /opt/postfix/conf "$@"' > /usr/local/sbin/postconf \
   && chmod +x /usr/local/sbin/postconf
 
-COPY supervisord.conf /etc/supervisor/supervisord.conf
-COPY syslog-ng.conf /etc/syslog-ng/syslog-ng.conf
-COPY syslog-ng-redis_slave.conf /etc/syslog-ng/syslog-ng-redis_slave.conf
-COPY postfix.sh /opt/postfix.sh
-COPY rspamd-pipe-ham /usr/local/bin/rspamd-pipe-ham
-COPY rspamd-pipe-spam /usr/local/bin/rspamd-pipe-spam
-COPY stop-supervisor.sh /usr/local/sbin/stop-supervisor.sh
+COPY supervisord.conf \
+  /etc/supervisor/
+COPY syslog-ng.conf \
+  syslog-ng-redis_slave.conf \
+  /etc/syslog-ng/
+COPY postfix.sh \
+  /opt/
+COPY rspamd-pipe-ham \
+  rspamd-pipe-spam \
+  /usr/local/bin/
+COPY stop-supervisor.sh \
+  /usr/local/sbin/
 
 RUN rm -rf /tmp/* /var/tmp/*
 
 EXPOSE 588
 
-COPY entrypoint.sh /
-ENTRYPOINT ["/entrypoint.sh"]
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

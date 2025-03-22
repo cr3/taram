@@ -133,7 +133,7 @@ COPY trim_logs.sh \
 COPY stop-supervisor.sh \
   /usr/local/sbin/
 
-COPY entrypoint.sh /
-ENTRYPOINT ["/entrypoint.sh"]
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

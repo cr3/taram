@@ -30,8 +30,8 @@ COPY lua /etc/rspamd/lua
 COPY local.d /etc/rspamd/local.d
 COPY override.d /etc/rspamd/override.d
 
-COPY entrypoint.sh /
-ENTRYPOINT ["/entrypoint.sh"]
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 STOPSIGNAL SIGTERM
 

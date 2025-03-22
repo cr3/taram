@@ -41,14 +41,18 @@ RUN echo "Building from repository $SOGO_DEBIAN_REPOSITORY" \
   && rm -rf /var/lib/apt/lists/* \
   && touch /etc/default/locale
 
-COPY ./bootstrap-sogo.sh /bootstrap-sogo.sh
-COPY syslog-ng.conf /etc/syslog-ng/syslog-ng.conf
-COPY syslog-ng-redis_slave.conf /etc/syslog-ng/syslog-ng-redis_slave.conf
-COPY supervisord.conf /etc/supervisor/supervisord.conf
-COPY acl.diff /acl.diff
-COPY stop-supervisor.sh /usr/local/sbin/stop-supervisor.sh
+COPY bootstrap-sogo.sh \
+  acl.diff \
+  /
+COPY supervisord.conf \
+  /etc/supervisor/
+COPY syslog-ng.conf \
+  syslog-ng-redis_slave.conf \
+  /etc/syslog-ng/
+COPY stop-supervisor.sh \
+  /usr/local/sbin/
 
-COPY entrypoint.sh /
-ENTRYPOINT ["/entrypoint.sh"]
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
