@@ -59,7 +59,9 @@ def test_api_get_mailboxes(db_model, api_app):
 
 def test_api_post_mailboxes(db_model, api_app, unique):
     """Posting a mailbox should create the mailbox in the api."""
-    local_part, domain = unique("text"), unique("domain")
+    local_part = unique("text")
+    domain = unique("domain")
+    password = unique("password")
     username = f"{local_part}@{domain}"
     api_app.post("/domains", json={
         "domain": domain,
@@ -68,8 +70,8 @@ def test_api_post_mailboxes(db_model, api_app, unique):
     api_app.post("/mailboxes", json={
         "local_part": local_part,
         "domain": domain,
-        "password": "",
-        "password2": "",
+        "password": password,
+        "password2": password,
     })
     response = api_app.get(f"/mailboxes/{username}")
     assert response.status_code == 200

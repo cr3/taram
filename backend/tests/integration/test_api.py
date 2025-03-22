@@ -26,6 +26,7 @@ def test_api_mailboxes(api_session, unique):
     """The API should expose a mailboxes API."""
     local_part = unique("text")
     domain = unique("domain")
+    password = unique("password")
     username = f"{local_part}@{domain}"
     api_session.post("/domains", json={
         "domain": domain,
@@ -34,8 +35,8 @@ def test_api_mailboxes(api_session, unique):
     api_session.post("/mailboxes", json={
         "local_part": local_part,
         "domain": domain,
-        "password": "",
-        "password2": "",
+        "password": password,
+        "password2": password,
     })
     api_session.put(f"/mailboxes/{username}", json={"name": "test"})
     try:
