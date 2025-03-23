@@ -102,16 +102,27 @@ def make_args_parser(schema):
                     content_schema = only(lookup(schema, *ref.split("/")[1:]))
 
                 for prop_name, prop_details in content_schema.get("properties", {}).items():
-
                     keys[prop_name] = "body"
                     required = prop_name in content_schema.get("required", [])
                     arg_name = prop_name if required else f"--{prop_name}"
-                    arg_type = get_arg_type(param["schema"].get("type"))
+                    arg_default = prop_details.get("default")
+                    arg_type = get_arg_type(prop_details.get("type"))
+                    kwargs = {}
+                    if arg_type is bool:
+                        if arg_default:
+                            arg_name = arg_name.replace(prop_name, f"no_{prop_name}")
+                            kwargs["dest"] = prop_name
+                            kwargs["action"] = "store_false"
+                        else:
+                            kwargs["action"] = "store_true"
+                    else:
+                        kwargs["type"] = arg_type
+
                     command_parser.add_argument(
-                        arg_name,
-                        type=arg_type,
-                        default=prop_details.get("default"),
+                        arg_name.replace("_", "-"),
+                        default=arg_default,
                         help=prop_details.get("title"),
+                        **kwargs,
                     )
 
             command_parser.set_defaults(
