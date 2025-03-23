@@ -1,34 +1,36 @@
-[tool.poetry]
+[project]
 name = "taram"
 version = "0.0.0"
 description = "Communauté de Notre-Dame-du-Laus"
-authors = ["Marc Tardif"]
+authors = [
+    {name = "Marc Tardif", email = "marc@interunion.ca"},
+]
 readme = "README.rst"
 repository = "https://github.com/cr3/taram"
 packages = [
-    { include = "taram" },
+    {include = "taram"},
 ]
-
-[tool.poetry.dependencies]
-python = "^3.11"
-aiodocker = "^0.24.0"
-alembic = "^1.14.1"
-attrs = "^25.3.0"
-bcrypt = "^4.3.0"
-dnspython = "^2.7.0"
-fastapi = "^0.115.6"
-ipaddress = "^1.0.23"
-lookuper = "^0.5.1"
-more-itertools = "^10.5.0"
-mysqlclient = "^2.2.7"
-pip-nftables = "^1.0.2.post1"
-pylibmc = "^1.6.3"
-redis = "^5.2.1"
-requests = "^2.32.3"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.37"}
-sqlalchemy-utils = "^0.41.2"
-uvicorn = "^0.34.0"
-yarl = "^1.18.3"
+requires-python = ">=3.11,<4.0"
+dependencies = [
+    "aiodocker (>=0.24.0,<1.0.0)",
+    "alembic (>=1.14.1,<2.0.0)",
+    "attrs (>=25.3.0,<26.0.0)",
+    "bcrypt (>=4.3.0,<5.0.0)",
+    "dnspython (>=2.7.0,<3.0.0)",
+    "fastapi (>=0.115.6,<1.0.0)",
+    "ipaddress (>=1.0.23,<2.0.0)",
+    "lookuper (>=0.5.1,<1.0.0)",
+    "more-itertools (>=10.5.0,<11.0.0)",
+    "mysqlclient (>=2.2.7,<3.0.0)",
+    "pip-nftables (>=1.0.2.post1,<2.0.0)",
+    "pylibmc (>=1.6.3,<2.0.0)",
+    "redis (>=5.2.1,<6.0.0)",
+    "requests (>=2.32.3,<3.0.0)",
+    "sqlalchemy[asyncio] (>=2.0.37,<3.0.0)",
+    "sqlalchemy-utils (>=0.41.2,<1.0.0)",
+    "uvicorn (>=0.34.0,<1.0.0)",
+    "yarl (>=1.18.3,<2.0.0)",
+]
 
 [tool.poetry.group.test.dependencies]
 coverage = "^7.2.3"
@@ -55,7 +57,7 @@ sphinx = "^6.1.3"
 sphinxcontrib-log-cabinet = "^1.0.1"
 sphinx-rtd-theme = "^1.2.0"
 
-[tool.poetry.plugins."pytest11"]
+[project.entry-points."pytest11"]
 taram = "taram.testing.fixtures"
 taram-db = "taram.testing.db"
 taram-managers = "taram.testing.managers"
@@ -63,21 +65,21 @@ taram-services = "taram.testing.services"
 taram-queue = "taram.testing.queue"
 taram-store = "taram.testing.store"
 
-[tool.poetry.plugins."pytest_unique"]
+[project.entry-points."pytest_unique"]
 db-model = "taram.testing.unique:unique_db_model"
 db-value = "taram.testing.unique:unique_db_value"
 domain = "taram.testing.unique:unique_domain"
 
-[tool.poetry.plugins."taram_queue"]
+[project.entry-points."taram_queue"]
 memory = "taram.queue:MemoryQueue"
 redis = "taram.queue:RedisQueue"
 
-[tool.poetry.plugins."taram_store"]
+[project.entry-points."taram_store"]
 memcached = "taram.store:MemcachedStore"
 memory = "taram.store:MemoryStore"
 redis = "taram.store:RedisStore"
 
-[tool.poetry.scripts]
+[project.scripts]
 netfilter = "taram.netfilter:main"
 taram = "taram.cli:main"
 
