@@ -10,24 +10,20 @@ from fastapi.testclient import TestClient
 
 from taram.api import (
     app,
-    get_domain_manager,
-    get_mailbox_manager,
+    get_db,
+    get_memcached,
+    get_redis,
 )
 from taram.logger import setup_logger
 from taram.testing.logger import LoggerHandler
 
 
 @pytest.fixture
-def api_app(db_session, domain_manager, mailbox_manager):
-
-    async def override_get_domain_manager():
-        yield domain_manager
-
-    async def override_get_mailbox_manager():
-        yield mailbox_manager
-
-    app.dependency_overrides[get_domain_manager] = override_get_domain_manager
-    app.dependency_overrides[get_mailbox_manager] = override_get_mailbox_manager
+def api_app(db_session, memcached_store, redis_store):
+    """API testing app."""
+    app.dependency_overrides[get_db] = lambda: db_session
+    app.dependency_overrides[get_memcached] = lambda: memcached_store
+    app.dependency_overrides[get_redis] = lambda: redis_store
 
     url = db_session.bind.engine.url
     env = {

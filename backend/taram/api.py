@@ -1,6 +1,7 @@
 """API service."""
 
 import logging
+from functools import partial
 from typing import Annotated
 
 from fastapi import (
@@ -28,6 +29,12 @@ from taram.schemas import (
     MailboxDetails,
     MailboxUpdate,
 )
+from taram.sogo import Sogo
+from taram.store import (
+    MemcachedStore,
+    RedisStore,
+    Store,
+)
 
 logger = logging.getLogger("uvicorn")
 app = FastAPI(docs_url="/swagger")
@@ -39,15 +46,24 @@ async def get_db():
 
 DbDep = Annotated[DBSession, Depends(get_db)]
 
-async def get_domain_manager(db: DbDep):
-    yield DomainManager(db)
+get_redis = RedisStore.from_env
+RedisDep = Annotated[Store, Depends(get_redis)]
 
+get_memcached = partial(MemcachedStore.from_host, "memcached")
+MemcachedDep = Annotated[Store, Depends(get_memcached)]
+
+def get_sogo(db: DbDep, memcached: MemcachedDep):
+    return Sogo(db, memcached)
+
+SogoDep = Annotated[Sogo, Depends(get_sogo)]
+
+def get_domain_manager(db: DbDep, redis: RedisDep):
+    return DomainManager(db, redis)
 
 DomainManagerDep = Annotated[DomainManager, Depends(get_domain_manager)]
 
-async def get_mailbox_manager(db: DbDep):
-    yield MailboxManager(db)
-
+def get_mailbox_manager(db: DbDep, redis: RedisDep, sogo: SogoDep):
+    return MailboxManager(db, redis, sogo)
 
 MailboxManagerDep = Annotated[MailboxManager, Depends(get_mailbox_manager)]
 
@@ -119,6 +135,12 @@ def get_sogo_auth(response: Response) -> None:
     response.headers["X-User"] = ""
     response.headers["X-Auth"] = ""
     response.headers["X-Auth-Type"] = ""
+
+
+@app.get("/rspamd/error")
+def get_rspamd_error(request: Request, redis: RedisDep) -> None:
+    redis.publish("F2B_CHANNEL", f"Rspamd UI: Invalid password by {request.client.host}")
+    raise HTTPException(401, "Invalid password")
 
 
 @app.exception_handler(KeyError)
