@@ -13,7 +13,7 @@ packages = [
 python = "^3.11"
 aiodocker = "^0.24.0"
 alembic = "^1.14.1"
-attrs = "^24.3.0"
+attrs = "^25.3.0"
 bcrypt = "^4.3.0"
 dnspython = "^2.7.0"
 fastapi = "^0.115.6"
@@ -36,8 +36,8 @@ dnspython = "^2.7.0"
 httpx = "^0.28.1"
 pyhamcrest = "^2.1.0"
 pytest = "^7.2.2"
-pytest-unique = "^0.1.2"
-pytest-xdocker = "^0.2.3"
+pytest-unique = "^0.1.4"
+pytest-xdocker = "^0.2.4"
 redis = "^5.2.1"
 responses = "^0.25.6"
 
@@ -60,12 +60,17 @@ taram = "taram.testing.fixtures"
 taram-db = "taram.testing.db"
 taram-managers = "taram.testing.managers"
 taram-services = "taram.testing.services"
+taram-queue = "taram.testing.queue"
 taram-store = "taram.testing.store"
 
 [tool.poetry.plugins."pytest_unique"]
 db-model = "taram.testing.unique:unique_db_model"
 db-value = "taram.testing.unique:unique_db_value"
 domain = "taram.testing.unique:unique_domain"
+
+[tool.poetry.plugins."taram_queue"]
+memory = "taram.queue:MemoryQueue"
+redis = "taram.queue:RedisQueue"
 
 [tool.poetry.plugins."taram_store"]
 memcached = "taram.store:MemcachedStore"

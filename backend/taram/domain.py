@@ -34,7 +34,7 @@ from taram.units import mebi
 class DomainManager:
 
     db: DBSession
-    redis: Store = field(factory=RedisStore.from_env)
+    store: Store = field(factory=RedisStore.from_env)
     dockerapi: HTTPSession = HTTPSession("http://dockerapi/")
 
     def get_origin_domain(self, domain):
@@ -117,7 +117,7 @@ class DomainManager:
         ).delete()
         self.db.add(model)
 
-        self.redis.hset("DOMAIN_MAP", model.domain, 1)
+        self.store.hset("DOMAIN_MAP", model.domain, 1)
 
         # TODO: dkim
 
@@ -169,8 +169,8 @@ class DomainManager:
         self.db.query(SpamaliasModel).filter(SpamaliasModel.address.like(domain)).delete()
         self.db.query(BccMapsModel).filter_by(local_dest=domain).delete()
 
-        self.redis.hdel("DOMAIN_MAP", domain)
-        self.redis.hdel("RL_VALUE", domain)
+        self.store.hdel("DOMAIN_MAP", domain)
+        self.store.hdel("RL_VALUE", domain)
 
     def _get_mailbox_data(self, domain):
         return (

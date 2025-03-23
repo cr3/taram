@@ -43,7 +43,7 @@ from taram.units import mebi
 class MailboxManager:
 
     db: DBSession
-    redis: Store = field(factory=RedisStore.from_env)
+    store: Store = field(factory=RedisStore.from_env)
     sogo: Sogo = field(
         default=Factory(lambda self: Sogo(self.db), takes_self=True),
     )
@@ -253,7 +253,7 @@ class MailboxManager:
         self.sogo.delete_user(username)
         self.sogo.update_static_view(username)
 
-        self.redis.hdel("RL_VALUE", username)
+        self.store.hdel("RL_VALUE", username)
 
         # TODO: oauth
         # TODO: update aliases

@@ -12,18 +12,20 @@ from taram.api import (
     app,
     get_db,
     get_memcached,
-    get_redis,
+    get_queue,
+    get_store,
 )
 from taram.logger import setup_logger
 from taram.testing.logger import LoggerHandler
 
 
 @pytest.fixture
-def api_app(db_session, memcached_store, redis_store):
+def api_app(db_session, memcached_store, redis_queue, redis_store):
     """API testing app."""
     app.dependency_overrides[get_db] = lambda: db_session
     app.dependency_overrides[get_memcached] = lambda: memcached_store
-    app.dependency_overrides[get_redis] = lambda: redis_store
+    app.dependency_overrides[get_queue] = lambda: redis_queue
+    app.dependency_overrides[get_store] = lambda: redis_store
 
     url = db_session.bind.engine.url
     env = {

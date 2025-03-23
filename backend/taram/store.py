@@ -2,7 +2,7 @@
 
 import json
 import os
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from contextlib import suppress
 from functools import wraps
 
@@ -15,7 +15,8 @@ from yarl import URL
 from taram.registry import registry_load
 
 
-class Store(metaclass=ABCMeta):
+@define
+class Store(ABC):
 
     @classmethod
     def from_url(cls, url: URL | str, registry=None) -> "Store":

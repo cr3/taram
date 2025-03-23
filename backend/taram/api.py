@@ -21,6 +21,10 @@ from taram.db import (
 )
 from taram.domain import DomainManager
 from taram.mailbox import MailboxManager
+from taram.queue import (
+    Queue,
+    RedisQueue,
+)
 from taram.schemas import (
     DomainCreate,
     DomainDetails,
@@ -46,8 +50,11 @@ async def get_db():
 
 DbDep = Annotated[DBSession, Depends(get_db)]
 
-get_redis = RedisStore.from_env
-RedisDep = Annotated[Store, Depends(get_redis)]
+get_queue = RedisQueue.from_env
+QueueDep = Annotated[Queue, Depends(get_queue)]
+
+get_store = RedisStore.from_env
+StoreDep = Annotated[Store, Depends(get_store)]
 
 get_memcached = partial(MemcachedStore.from_host, "memcached")
 MemcachedDep = Annotated[Store, Depends(get_memcached)]
@@ -57,13 +64,13 @@ def get_sogo(db: DbDep, memcached: MemcachedDep):
 
 SogoDep = Annotated[Sogo, Depends(get_sogo)]
 
-def get_domain_manager(db: DbDep, redis: RedisDep):
-    return DomainManager(db, redis)
+def get_domain_manager(db: DbDep, store: StoreDep):
+    return DomainManager(db, store)
 
 DomainManagerDep = Annotated[DomainManager, Depends(get_domain_manager)]
 
-def get_mailbox_manager(db: DbDep, redis: RedisDep, sogo: SogoDep):
-    return MailboxManager(db, redis, sogo)
+def get_mailbox_manager(db: DbDep, store: StoreDep, sogo: SogoDep):
+    return MailboxManager(db, store, sogo)
 
 MailboxManagerDep = Annotated[MailboxManager, Depends(get_mailbox_manager)]
 
@@ -138,8 +145,8 @@ def get_sogo_auth(response: Response) -> None:
 
 
 @app.get("/rspamd/error")
-def get_rspamd_error(request: Request, redis: RedisDep) -> None:
-    redis.publish("F2B_CHANNEL", f"Rspamd UI: Invalid password by {request.client.host}")
+def get_rspamd_error(request: Request, queue: QueueDep) -> None:
+    queue.publish("F2B_CHANNEL", f"Rspamd UI: Invalid password by {request.client.host}")
     raise HTTPException(401, "Invalid password")
 
 

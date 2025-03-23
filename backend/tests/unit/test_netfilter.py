@@ -399,16 +399,35 @@ def test_netfilter_service_blacklist():
 
 def test_netfilter_service_before_exit():
     """The service should unsubscribe before exit."""
-    pubsub = Mock()
-    NetfilterService(None, pubsub).before_exit()
-    pubsub.unsubscribe.assert_called_once()
+    queue = Mock()
+    NetfilterService(None, queue).before_exit()
+    queue.unsubscribe.assert_called_once()
 
 
 def test_netfilter_service_before_exit_clear():
     """The service should clear when asked before exit."""
-    netfilter, pubsub = Mock(), Mock()
-    NetfilterService(netfilter, pubsub, clear_before_exit=True).before_exit()
+    netfilter, queue = Mock(), Mock()
+    NetfilterService(netfilter, queue, clear_before_exit=True).before_exit()
     netfilter.clear.assert_called_once()
+
+
+def test_netfilter_service_watch(memory_queue):
+    """Watching should ban when a message matches on the F2B_CHANNEL."""
+    netfilter = Mock()
+    service = NetfilterService(netfilter, memory_queue)
+
+    def ban(_):
+        service.exit_now = True
+
+    netfilter.ban.side_effect = ban
+    memory_queue.publish(
+        "F2B_CHANNEL",
+        "mail UI: Invalid password for .+ by 1.2.3.4",
+    )
+
+    service.watch()
+
+    netfilter.ban.assert_called_once()
 
 
 @patch("sys.stdout")
