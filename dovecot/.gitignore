@@ -3,7 +3,7 @@ conf/dovecot-master.passwd
 conf/dovecot-master.userdb
 conf/extra.conf
 conf/lua
-conf/mail_plugins
+conf/mail_plugins*
 conf/shared_namespace.conf
 conf/sni.conf
 conf/sogo-sso.conf
