@@ -48,7 +48,7 @@ services:
     entrypoint: /docker-entrypoint.sh
     command: redis-server /redis.conf
     volumes:
-      - ./redis/docker-entrypoint.sh:/docker-entrypoint.sh:z
+      - ./redis/docker-entrypoint.sh:/docker-entrypoint.sh:Z
       - redis-vol-1:/data/
     restart: always
     ports:
@@ -200,7 +200,6 @@ services:
       - DBUSER=${DBUSER}
       - DBPASS=${DBPASS}
       - MAIL_HOSTNAME=${MAIL_HOSTNAME}
-#      - MAIL_PASS_SCHEME=${MAIL_PASS_SCHEME:-BLF-CRYPT}
       - IPV4_NETWORK=${IPV4_NETWORK:-172.22.1}
       - ALLOW_ADMIN_EMAIL_LOGIN=${ALLOW_ADMIN_EMAIL_LOGIN:-n}
       - MAILDIR_GC_TIME=${MAILDIR_GC_TIME:-7200}
@@ -260,7 +259,6 @@ services:
       - DBUSER=${DBUSER}
       - DBPASS=${DBPASS}
       - MAIL_HOSTNAME=${MAIL_HOSTNAME}
-#      - MAIL_PASS_SCHEME=${MAIL_PASS_SCHEME:-BLF-CRYPT}
       - ACL_ANYONE=${ACL_ANYONE:-disallow}
       - ALLOW_ADMIN_EMAIL_LOGIN=${ALLOW_ADMIN_EMAIL_LOGIN:-n}
       - IPV4_NETWORK=${IPV4_NETWORK:-172.22.1}
@@ -269,6 +267,7 @@ services:
       - REDIS_SLAVEOF_IP=${REDIS_SLAVEOF_IP:-}
       - REDIS_SLAVEOF_PORT=${REDIS_SLAVEOF_PORT:-}
       - REDISPASS=${REDISPASS}
+      - TZ=${TZ}
     dns:
       - ${IPV4_NETWORK:-172.22.1}.254
     volumes:
@@ -292,6 +291,81 @@ services:
     networks:
       mail-network:
         ipv4_address: ${IPV4_NETWORK:-172.22.1}.248
+
+  nginx:
+    build: nginx
+    depends_on:
+      - redis
+      - api
+      - frontend
+      - sogo
+      - rspamd
+    dns:
+      - ${IPV4_NETWORK:-172.22.1}.254
+    environment:
+      - HTTPS_PORT=${HTTPS_PORT:-443}
+      - HTTP_PORT=${HTTP_PORT:-80}
+      - MAIL_HOSTNAME=${MAIL_HOSTNAME}
+      - ADDITIONAL_SERVER_NAMES=${ADDITIONAL_SERVER_NAMES:-}
+      - TZ=${TZ}
+      - SKIP_SOGO=${SKIP_SOGO:-n}
+      - SKIP_RSPAMD=${SKIP_RSPAMD:-n}
+      - DISABLE_IPv6=${DISABLE_IPv6:-n}
+      - SOGOHOST=${SOGOHOST:-}
+      - RSPAMDHOST=${RSPAMDHOST:-}
+      - REDISHOST=${REDISHOST:-}
+      - IPV4_NETWORK=${IPV4_NETWORK:-172.22.1}
+    volumes:
+      - ./acme/.well-known:/web/.well-known:ro,z
+      - ./nginx/conf.d/:/etc/nginx/conf.d/:z
+      - ./ssl/:/etc/ssl/mail/:ro,z
+      - sogo-web-vol-1:/usr/lib/GNUstep/SOGo/
+    ports:
+      - "${HTTPS_BIND:-}:${HTTPS_PORT:-443}:${HTTPS_PORT:-443}"
+      - "${HTTP_BIND:-}:${HTTP_PORT:-80}:${HTTP_PORT:-80}"
+    restart: always
+    networks:
+      - mail-network
+
+  acme:
+    build: acme
+    depends_on:
+      - nginx
+      - unbound
+      - dockerapi
+      - dovecot
+      - mysql
+      - postfix
+      - redis
+    dns:
+      - ${IPV4_NETWORK:-172.22.1}.254
+    environment:
+      - ACME_CONTACT=${ACME_CONTACT:-}
+      - ADDITIONAL_SAN=${ADDITIONAL_SAN}
+      - AUTODISCOVER_SAN=${AUTODISCOVER_SAN:-y}
+      - MAIL_HOSTNAME=${MAIL_HOSTNAME}
+      - DBNAME=${DBNAME}
+      - DBUSER=${DBUSER}
+      - DBPASS=${DBPASS}
+      - DIRECTORY_URL=${DIRECTORY_URL:-}
+      - ENABLE_SSL_SNI=${ENABLE_SSL_SNI:-n}
+      - SKIP_IP_CHECK=${SKIP_IP_CHECK:-n}
+      - SKIP_HTTP_VERIFICATION=${SKIP_HTTP_VERIFICATION:-n}
+      - ONLY_MAIL_HOSTNAME=${ONLY_MAIL_HOSTNAME:-n}
+      - LE_STAGING=${LE_STAGING:-n}
+      - REDIS_SLAVEOF_IP=${REDIS_SLAVEOF_IP:-}
+      - REDIS_SLAVEOF_PORT=${REDIS_SLAVEOF_PORT:-}
+      - REDISPASS=${REDISPASS}
+      - SNAT_TO_SOURCE=${SNAT_TO_SOURCE:-n}
+      - SNAT6_TO_SOURCE=${SNAT6_TO_SOURCE:-n}
+    volumes:
+      - ./acme/.well-known/acme-challenge:/var/www/acme:z
+      - ./ssl:/var/lib/acme/:z
+      - ./ssl-example:/var/lib/ssl-example/:ro,Z
+      - mysql-socket-vol-1:/var/run/mysqld/
+    restart: always
+    networks:
+      - mail-network
 
   netfilter:
     build: backend
@@ -333,8 +407,10 @@ services:
     dns:
       - ${IPV4_NETWORK:-172.22.1}.254
     depends_on:
+      - acme
       - dockerapi
       - mysql
+      - redis
     ports:
       - "${MONIT_PORT:-127.0.0.1:2812}:2812"
     volumes:
@@ -351,6 +427,7 @@ services:
   ipv6nat:
     image: robbertkl/ipv6nat
     depends_on:
+      - acme
       - clamd
       - dovecot
       - dockerapi
@@ -358,6 +435,7 @@ services:
       - monit
       - mysql
       - netfilter
+      - nginx
       - postfix
       - redis
       - rspamd

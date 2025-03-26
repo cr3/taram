@@ -1,9 +1,10 @@
 Version 0.2.0
 -------------
 
-Released 2025-03-07
+Released 2025-03-26
 
 -   Add API service.
+-   Add Acme service.
 -   Add Clamd service.
 -   Add DockerAPI service.
 -   Add Dovecot service.
@@ -13,6 +14,7 @@ Released 2025-03-07
 -   Add Monit service.
 -   Add MySQL service.
 -   Add Netfilter service.
+-   Add Nginx service.
 -   Add Postfix service.
 -   Add Rspamd service.
 -   Add SOGo service.
