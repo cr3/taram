@@ -145,12 +145,12 @@ function auth_password_verify(req, pass)
 
   -- check against mailbox passwds
   local cur,errorString = con:execute(string.format([[SELECT password FROM mailbox
-    LEFT JOIN user_attributes ON user_attributes.username = mailbox.username
-    WHERE username = '%s'
+    LEFT JOIN user_attributes AS ua ON ua.username = mailbox.username
+    WHERE ua.username = '%s'
       AND active = 1
       AND domain IN (SELECT domain FROM domain WHERE domain = '%s' AND active = 1)
-      AND IFNULL(user_attributes.force_pw_update, 0) != 1
-      AND IFNULL(user_attributes.%s_access, 1) = 1]], con:escape(req.user), con:escape(req.domain), con:escape(req.service)))
+      AND ua.force_pw_update = 0
+      AND ua.%s_access = 1]], con:escape(req.user), con:escape(req.domain), con:escape(req.service)))
   local row = cur:fetch ({}, "a")
   while row do
     if req.password_verify(req, row.password, pass) == 1 then
