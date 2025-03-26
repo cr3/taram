@@ -111,15 +111,18 @@ def make_args_parser(schema):
                     if arg_type is bool:
                         if arg_default:
                             arg_name = arg_name.replace(prop_name, f"no_{prop_name}")
-                            kwargs["dest"] = prop_name
                             kwargs["action"] = "store_false"
                         else:
                             kwargs["action"] = "store_true"
                     else:
                         kwargs["type"] = arg_type
 
+                    if not required:
+                        arg_name = arg_name.replace("_", "-")
+                        kwargs["dest"] = prop_name
+
                     command_parser.add_argument(
-                        arg_name.replace("_", "-"),
+                        arg_name,
                         default=arg_default,
                         help=prop_details.get("title"),
                         **kwargs,
